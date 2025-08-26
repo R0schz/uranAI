@@ -1,4 +1,13 @@
-from sqlalchemy import create_engine, Column, Integer, String, Boolean, ForeignKey, TIMESTAMP
+from sqlalchemy import (
+    create_engine, 
+    Column, 
+    Integer, 
+    String, 
+    Boolean, 
+    ForeignKey, 
+    TIMESTAMP,
+    Date
+)
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 import os
@@ -23,8 +32,6 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     email = Column(String, unique=True, index=True)
     hashed_password = Column(String)
-    is_active = Column(Boolean, default=True)
-    created_at = Column(TIMESTAMP)
     plan = Column(String, default="free")
     tickets = Column(Integer, default=5)
     stripe_customer_id = Column(String, nullable=True)
