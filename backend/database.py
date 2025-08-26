@@ -6,7 +6,10 @@ from sqlalchemy import (
     Boolean, 
     ForeignKey, 
     TIMESTAMP,
-    Date
+    Date,
+    Time,
+    JSON,
+    Text,
 )
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
