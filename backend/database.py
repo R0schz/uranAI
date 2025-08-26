@@ -1,8 +1,17 @@
-from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Date, Time, JSON, Text, TIMESTAMP
+import os
+from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship, sessionmaker
+from sqlalchemy.orm import sessionmaker
 
-DATABASE_URL = "postgresql://user:password@localhost/uranai"
+# データベースURLを環境変数から取得（デフォルト値はローカル開発用）
+DATABASE_URL = os.getenv(
+    "DATABASE_URL",
+    "postgresql://user:password@localhost:5432/uranai"
+)
+
+# Renderのデータベース接続文字列を修正（必要な場合）
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
