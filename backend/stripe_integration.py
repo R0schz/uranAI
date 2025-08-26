@@ -1,7 +1,7 @@
 import stripe
 from fastapi import APIRouter, HTTPException
 
-stripe.api_key = "your_stripe_secret_key"
+stripe.api_key = "sk_test_51S0PU7AyQzk81ZkIaFYzuT2UtnY4WnjZ1vfRotTP24swQO0t7BwaecM8Ofeb0msIONwO2umjKTkJiG2hNDk8aNSd00swKNebXV"
 
 router = APIRouter()
 
