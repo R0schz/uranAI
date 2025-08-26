@@ -9,7 +9,7 @@ from kerykeion import AstrologicalSubject
 
 router = APIRouter()
 
-SECRET_KEY = "your_secret_key"
+SECRET_KEY = "c835962b4ca66e10cd470dfa17cde14b"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
