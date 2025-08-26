@@ -1,7 +1,6 @@
-import os
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, Column, Integer, String, Boolean, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, relationship
 
 # データベースURLを環境変数から取得（デフォルト値はローカル開発用）
 DATABASE_URL = os.getenv(
@@ -17,12 +16,13 @@ engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
+# モデルの定義
 class User(Base):
     __tablename__ = "users"
-
     id = Column(Integer, primary_key=True, index=True)
     email = Column(String, unique=True, index=True)
     hashed_password = Column(String)
+    is_active = Column(Boolean, default=True)
     plan = Column(String, default="free")
     tickets = Column(Integer, default=5)
     stripe_customer_id = Column(String, nullable=True)
