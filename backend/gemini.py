@@ -1,8 +1,10 @@
 from google import genai
+from dotenv import load_dotenv
 
-GEMINI_API_KEY = "AIzaSyCGfERhw9POcFwcuwtOlmoBfbXIIj4CFlQ"
+load_dotenv(dotenv_path='.env.local')
 
-# The client gets the API key from the environment variable `GEMINI_API_KEY`.
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+
 client = genai.Client(api_key=GEMINI_API_KEY)
 
 def generate_narrative(prompt: str) -> str:

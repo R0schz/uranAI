@@ -1,11 +1,14 @@
 "use client";
 
 import React, { useState } from 'react';
-import { useAppContext } from '../../contexts/AppContext';
+import { useAppContext, useAppStore } from '../../contexts/AppContext';
 import Modal from './Modal';
 
 const RegisterModal = () => {
-  const { hideModal, showModal, register, setCurrentScreen } = useAppContext();
+  // 関数はContextから、状態の変更関数はZustandストアから取得
+  const { register } = useAppContext();
+  const { showModal, hideModal } = useAppStore();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -17,13 +20,8 @@ const RegisterModal = () => {
       setError('パスワードが一致しません');
       return;
     }
-    try {
-      await register(email, password);
-      hideModal();
-      setCurrentScreen('home-screen');
-    } catch (err: any) {
-      setError(err.message || '登録に失敗しました');
-    }
+    // 登録処理を呼び出すだけ。成功後の画面遷移はAppContextの監視機能が担当します。
+    await register(email, password);
   };
 
   const handleShowLogin = () => {

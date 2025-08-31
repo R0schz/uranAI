@@ -3,6 +3,7 @@
 import { useAppStore, Person } from '../contexts/AppContext';
 
 const PersonSelectScreen = () => {
+  // Zustandストアから直接状態と更新関数を取得
   const {
     currentScreen,
     fortunePurpose,
@@ -11,6 +12,7 @@ const PersonSelectScreen = () => {
     isPremium,
     setCurrentScreen,
     setSelectedPeople,
+    showModal,
   } = useAppStore();
 
   if (currentScreen !== 'person-select-screen') return null;
@@ -27,10 +29,9 @@ const PersonSelectScreen = () => {
       } else if (maxSelection === 1) {
         newSelectedPeople = [id];
       } else {
-        return; // Cannot select more than max
+        return;
       }
     }
-
     setSelectedPeople(newSelectedPeople);
   };
 
@@ -40,10 +41,10 @@ const PersonSelectScreen = () => {
 
   const handleAddPerson = () => {
     if (!isPremium && people.length >= 3) {
-      // Show premium modal
+      showModal('premium');
       return;
     }
-    // Show add person modal
+    showModal('addPerson');
   };
 
   const description = fortunePurpose === 'personal'

@@ -13,12 +13,18 @@ import ResultScreen from '../components/ResultScreen';
 import MyPage from '../components/MyPage';
 
 export default function App() {
-  const {
-    currentScreen,
-    activeModal,
-  } = useAppStore();
+  // Zustandストアから直接、必要な状態を取得
+  const { currentScreen, activeModal, isAuthChecked } = useAppStore();
 
-  // 現在のスクリーンに基づいて表示するコンポーネントを決定
+  // 認証チェックが完了するまでスプラッシュ画面を表示
+  if (!isAuthChecked) {
+    return (
+      <Layout>
+        <SplashScreen />
+      </Layout>
+    );
+  }
+
   const getCurrentScreen = () => {
     switch (currentScreen) {
       case 'splash-screen':
@@ -40,7 +46,8 @@ export default function App() {
       case 'mypage-screen':
         return <MyPage />;
       default:
-        return null;
+        // 認証済みだが画面が確定しない場合はホームを表示
+        return <HomeScreen />;
     }
   };
 

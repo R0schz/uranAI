@@ -1,6 +1,6 @@
 "use client";
 
-import { useAppContext } from '../contexts/AppContext';
+import { useAppStore } from '../contexts/AppContext'; // useAppContextを削除し、useAppStoreをインポート
 import Header from './Header';
 import Navigation from './Navigation';
 import { LogoIcon } from './Icons';
@@ -11,19 +11,21 @@ interface LayoutProps {
 }
 
 const Layout = ({ children }: LayoutProps) => {
-  const { state } = useAppContext();
+  // Zustandストアから直接isLoggedInの状態を取得
+  const { isLoggedIn } = useAppStore();
 
   return (
     <>
       <LogoIcon />
       <StarBackground />
-      {state.isLoggedIn && <Header />}
+      {/* 取得したisLoggedInを直接使用 */}
+      {isLoggedIn && <Header />}
       <main id="app-container" className="relative">
         <div id="content-wrapper">
           {children}
         </div>
       </main>
-      {state.isLoggedIn && <Navigation />}
+      {isLoggedIn && <Navigation />}
     </>
   );
 };

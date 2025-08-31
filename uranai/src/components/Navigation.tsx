@@ -3,11 +3,8 @@
 import { useAppStore } from '../contexts/AppContext';
 
 const Navigation = () => {
-  const {
-    isLoggedIn,
-    currentScreen,
-    setCurrentScreen,
-  } = useAppStore();
+  // Zustandストアから直接状態と更新関数を取得
+  const { isLoggedIn, currentScreen, setCurrentScreen } = useAppStore();
 
   if (!isLoggedIn) return null;
 

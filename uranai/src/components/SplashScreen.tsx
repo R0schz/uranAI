@@ -3,10 +3,8 @@
 import { useAppStore } from '../contexts/AppContext';
 
 const SplashScreen = () => {
-  const {
-    currentScreen,
-    showModal,
-  } = useAppStore();
+  // 状態と関数をZustandから取得
+  const { currentScreen, showModal } = useAppStore();
 
   if (currentScreen !== 'splash-screen') return null;
 

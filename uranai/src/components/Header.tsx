@@ -1,18 +1,19 @@
 "use client";
 
-import { useAppContext } from '../contexts/AppContext';
+import { useAppStore } from '../contexts/AppContext';
 
 const Header = () => {
-  const { state, setState } = useAppContext();
+  // 状態をZustandから取得
+  const { isLoggedIn, isPremium, tickets, setCurrentScreen } = useAppStore();
 
-  if (!state.isLoggedIn) return null;
+  if (!isLoggedIn) return null;
 
   return (
     <header id="app-header" className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-4">
       <div
         data-action="back-to-home"
         className="flex items-center gap-2 cursor-pointer transition-opacity hover:opacity-80"
-        onClick={() => setState(prev => ({ ...prev, currentScreen: 'home-screen' }))}
+        onClick={() => setCurrentScreen('home-screen')}
       >
         <svg width="32" height="32" className="glow-filter">
           <use href="#logo-icon"></use>
@@ -22,7 +23,7 @@ const Header = () => {
         </span>
       </div>
       <div id="header-user-status">
-        {state.isPremium ? (
+        {isPremium ? (
           <div id="premium-user-header">
             <div className="flex items-center gap-2 premium-text-glow">
               <i data-lucide="gem" className="w-5 h-5"></i>
@@ -34,7 +35,7 @@ const Header = () => {
             <div className="flex items-center gap-1 text-yellow-300">
               <i data-lucide="ticket" className="w-5 h-5"></i>
               <span id="header-ticket-count" className="font-bold text-lg">
-                {state.tickets}
+                {tickets}
               </span>
             </div>
             <button

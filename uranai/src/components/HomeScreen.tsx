@@ -1,19 +1,17 @@
 "use client";
 
-import { useAppContext } from '../contexts/AppContext';
+import { useAppStore } from '../contexts/AppContext';
 
 const HomeScreen = () => {
-  const { state, setState } = useAppContext();
+  // Zustandストアから直接状態と更新関数を取得
+  const { currentScreen, setFortunePurpose, setSelectedPeople, setCurrentScreen } = useAppStore();
 
-  if (state.currentScreen !== 'home-screen') return null;
+  if (currentScreen !== 'home-screen') return null;
 
   const handlePurposeSelect = (purpose: 'personal' | 'compatibility') => {
-    setState(prev => ({
-      ...prev,
-      fortunePurpose: purpose,
-      selectedPeople: [],
-      currentScreen: 'person-select-screen'
-    }));
+    setFortunePurpose(purpose);
+    setSelectedPeople([]);
+    setCurrentScreen('person-select-screen');
   };
 
   return (
