@@ -5,7 +5,7 @@ import { useAppContext } from '../../contexts/AppContext';
 import Modal from './Modal';
 
 const RegisterModal = () => {
-  const { hideModal, showModal, register } = useAppContext();
+  const { hideModal, showModal, register, setCurrentScreen } = useAppContext();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -20,6 +20,7 @@ const RegisterModal = () => {
     try {
       await register(email, password);
       hideModal();
+      setCurrentScreen('home-screen');
     } catch (err: any) {
       setError(err.message || '登録に失敗しました');
     }

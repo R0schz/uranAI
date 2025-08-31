@@ -1,21 +1,29 @@
 "use client";
 
-import { useAppContext } from '../contexts/AppContext';
+import { useAppStore, Person } from '../contexts/AppContext';
 
 const PersonSelectScreen = () => {
-  const { state, setState } = useAppContext();
+  const {
+    currentScreen,
+    fortunePurpose,
+    selectedPeople,
+    people,
+    isPremium,
+    setCurrentScreen,
+    setSelectedPeople,
+  } = useAppStore();
 
-  if (state.currentScreen !== 'person-select-screen') return null;
+  if (currentScreen !== 'person-select-screen') return null;
 
   const handlePersonSelect = (id: number) => {
-    const maxSelection = state.fortunePurpose === 'personal' ? 1 : 2;
+    const maxSelection = fortunePurpose === 'personal' ? 1 : 2;
     let newSelectedPeople: number[];
 
-    if (state.selectedPeople.includes(id)) {
-      newSelectedPeople = state.selectedPeople.filter(personId => personId !== id);
+    if (selectedPeople.includes(id)) {
+      newSelectedPeople = selectedPeople.filter((personId: number) => personId !== id);
     } else {
-      if (state.selectedPeople.length < maxSelection) {
-        newSelectedPeople = [...state.selectedPeople, id];
+      if (selectedPeople.length < maxSelection) {
+        newSelectedPeople = [...selectedPeople, id];
       } else if (maxSelection === 1) {
         newSelectedPeople = [id];
       } else {
@@ -23,34 +31,28 @@ const PersonSelectScreen = () => {
       }
     }
 
-    setState(prev => ({
-      ...prev,
-      selectedPeople: newSelectedPeople
-    }));
+    setSelectedPeople(newSelectedPeople);
   };
 
   const handleConfirm = () => {
-    setState(prev => ({
-      ...prev,
-      currentScreen: 'fortune-type-screen'
-    }));
+    setCurrentScreen('fortune-type-screen');
   };
 
   const handleAddPerson = () => {
-    if (!state.isPremium && state.people.length >= 3) {
+    if (!isPremium && people.length >= 3) {
       // Show premium modal
       return;
     }
     // Show add person modal
   };
 
-  const description = state.fortunePurpose === 'personal'
+  const description = fortunePurpose === 'personal'
     ? '鑑定したい人物を1人選択してください。'
-    : `鑑定したい人物を2人選択してください。(${state.selectedPeople.length}/2)`;
+    : `鑑定したい人物を2人選択してください。(${selectedPeople.length}/2)`;
 
-  const isConfirmEnabled = state.fortunePurpose === 'personal'
-    ? state.selectedPeople.length === 1
-    : state.selectedPeople.length === 2;
+  const isConfirmEnabled = fortunePurpose === 'personal'
+    ? selectedPeople.length === 1
+    : selectedPeople.length === 2;
 
   return (
     <section className="page p-4">
@@ -58,12 +60,12 @@ const PersonSelectScreen = () => {
         <h2 className="font-serif-special text-3xl text-center mb-4">人物を選択</h2>
         <p className="text-center text-gray-400 mb-8">{description}</p>
         <div className="space-y-4 mb-6">
-          {state.people.map(person => (
+          {people.map((person: Person) => (
             <div
               key={person.id}
               onClick={() => handlePersonSelect(person.id)}
               className={`person-card card p-4 flex items-center justify-between cursor-pointer transition ${
-                state.selectedPeople.includes(person.id) ? 'border-purple-400' : ''
+                selectedPeople.includes(person.id) ? 'border-purple-400' : ''
               }`}
             >
               <div className="flex items-center">
@@ -76,7 +78,7 @@ const PersonSelectScreen = () => {
                 </div>
               </div>
               <div className={`select-indicator w-6 h-6 rounded-full border-2 ${
-                state.selectedPeople.includes(person.id)
+                selectedPeople.includes(person.id)
                   ? 'bg-purple-500 border-purple-400'
                   : 'border-gray-500'
               }`}></div>

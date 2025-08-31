@@ -5,14 +5,24 @@ import { useAppContext } from '../../contexts/AppContext';
 import Modal from './Modal';
 
 const LoginModal = () => {
-  const { state, showModal, hideModal, login } = useAppContext();
+  const { state, showModal, hideModal, login, setCurrentScreen } = useAppContext();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   if (state.isLoggedIn) return null;
 
   const handleLogin = async () => {
-    await login(email, password);
+    if (!email || !password) {
+      alert('メールアドレスとパスワードを入力してください。');
+      return;
+    }
+    try {
+      await login(email, password);
+      hideModal();
+      setCurrentScreen('home-screen');
+    } catch (error) {
+      alert('ログインに失敗しました。');
+    }
   };
 
   const handleShowRegister = () => {

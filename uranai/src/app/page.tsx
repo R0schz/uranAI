@@ -1,6 +1,6 @@
 "use client";
 
-import { useAppContext } from '../contexts/AppContext';
+import { useAppStore } from '../contexts/AppContext';
 import Layout from '../components/Layout';
 import SplashScreen from '../components/SplashScreen';
 import ModalContainer from '../components/modals/ModalContainer';
@@ -13,11 +13,14 @@ import ResultScreen from '../components/ResultScreen';
 import MyPage from '../components/MyPage';
 
 export default function App() {
-  const { state } = useAppContext();
+  const {
+    currentScreen,
+    activeModal,
+  } = useAppStore();
 
   // 現在のスクリーンに基づいて表示するコンポーネントを決定
   const getCurrentScreen = () => {
-    switch (state.currentScreen) {
+    switch (currentScreen) {
       case 'splash-screen':
         return <SplashScreen />;
       case 'home-screen':
@@ -44,7 +47,7 @@ export default function App() {
   return (
     <Layout>
       {getCurrentScreen()}
-      <ModalContainer />
+      <ModalContainer activeModal={activeModal} />
     </Layout>
   );
 }

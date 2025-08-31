@@ -1,14 +1,18 @@
 "use client";
 
-import { useAppContext } from '../contexts/AppContext';
+import { useAppStore } from '../contexts/AppContext';
 
 const Navigation = () => {
-  const { state, setState } = useAppContext();
+  const {
+    isLoggedIn,
+    currentScreen,
+    setCurrentScreen,
+  } = useAppStore();
 
-  if (!state.isLoggedIn) return null;
+  if (!isLoggedIn) return null;
 
   const handleNavigate = (screen: string) => {
-    setState(prev => ({ ...prev, currentScreen: screen }));
+    setCurrentScreen(screen);
   };
 
   return (
@@ -16,7 +20,7 @@ const Navigation = () => {
       <div
         onClick={() => handleNavigate('home-screen')}
         className={`nav-item text-center text-gray-400 cursor-pointer ${
-          state.currentScreen === 'home-screen' ? 'active' : ''
+          currentScreen === 'home-screen' ? 'active' : ''
         }`}
       >
         <i data-lucide="home" className="w-7 h-7 mx-auto"></i>
@@ -25,7 +29,7 @@ const Navigation = () => {
       <div
         onClick={() => handleNavigate('mypage-screen')}
         className={`nav-item text-center text-gray-400 cursor-pointer ${
-          state.currentScreen === 'mypage-screen' ? 'active' : ''
+          currentScreen === 'mypage-screen' ? 'active' : ''
         }`}
       >
         <i data-lucide="user-circle" className="w-7 h-7 mx-auto"></i>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useAppContext } from '../../contexts/AppContext';
+import { useAppContext, ModalType } from '../../contexts/AppContext';
 import LoginModal from './LoginModal';
 import RegisterModal from './RegisterModal';
 import PremiumModal from './PremiumModal';
@@ -8,9 +8,11 @@ import TicketModal from './TicketModal';
 import AddPersonModal from './AddPersonModal';
 import ConfirmPersonModal from './ConfirmPersonModal';
 
-const ModalContainer = () => {
-  const { activeModal } = useAppContext();
+interface ModalContainerProps {
+  activeModal: ModalType;
+}
 
+const ModalContainer: React.FC<ModalContainerProps> = ({ activeModal }) => {
   if (!activeModal) return null;
 
   const renderModal = () => {

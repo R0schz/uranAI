@@ -1,6 +1,6 @@
 "use client";
 
-import { useAppContext } from '../contexts/AppContext';
+import { useAppStore, Person } from '../contexts/AppContext';
 
 interface InputField {
   name: string;
@@ -11,24 +11,31 @@ interface InputField {
 }
 
 const InformationInputScreen = () => {
-  const { state, setState } = useAppContext();
+  const {
+    currentScreen,
+    fortuneType,
+    fortunePurpose,
+    selectedPeople,
+    people,
+    setCurrentScreen,
+  } = useAppStore();
 
-  if (state.currentScreen !== 'input-screen') return null;
+  if (currentScreen !== 'input-screen') return null;
 
-  const person1 = state.people.find(p => p.id === state.selectedPeople[0]);
+  const person1 = people.find((p: Person) => p.id === selectedPeople[0]);
   if (!person1) return null;
 
   const getInputFields = (): InputField[] => {
     const fields: InputField[] = [];
     
-    switch (state.fortuneType) {
+    switch (fortuneType) {
       case 'numerology':
         fields.push(
           { name: 'name1', label: '名前(ひらがな)', type: 'text', placeholder: 'てすと はなこ', value: person1.name },
           { name: 'birthDate1', label: '生年月日', type: 'date', placeholder: '', value: person1.birthDate }
         );
-        if (state.fortunePurpose === 'compatibility') {
-          const person2 = state.people.find(p => p.id === state.selectedPeople[1]);
+        if (fortunePurpose === 'compatibility') {
+          const person2 = people.find((p: Person) => p.id === selectedPeople[1]);
           fields.push(
             { name: 'name2', label: '相手の名前(ひらがな)', type: 'text', placeholder: 'てすと たろう', value: person2?.name },
             { name: 'birthDate2', label: '相手の生年月日', type: 'date', placeholder: '', value: person2?.birthDate }
@@ -51,10 +58,10 @@ const InformationInputScreen = () => {
   };
 
   const handleGetFortune = () => {
-    if (state.fortuneType === 'tarot') {
-      setState(prev => ({ ...prev, currentScreen: 'tarot-touch-screen' }));
+    if (fortuneType === 'tarot') {
+      setCurrentScreen('tarot-touch-screen');
     } else {
-      setState(prev => ({ ...prev, currentScreen: 'result-screen' }));
+      setCurrentScreen('result-screen');
     }
   };
 
@@ -81,7 +88,7 @@ const InformationInputScreen = () => {
               />
             </div>
           ))}
-          {state.fortuneType !== 'tarot' && (
+          {fortuneType !== 'tarot' && (
             <div>
               <label className="block text-sm font-medium text-gray-400 mb-2">
                 相談内容 (任意)

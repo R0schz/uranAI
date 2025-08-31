@@ -1,21 +1,25 @@
 "use client";
 
-import { useAppContext } from '../contexts/AppContext';
+import { useAppStore } from '../contexts/AppContext';
 import TarotShuffle from './animations/TarotShuffle';
 import HoroscopeLoading from './animations/HoroscopeLoading';
 import NumerologyLoading from './animations/NumerologyLoading';
 
 const LoadingScreen = () => {
-  const { state, setState } = useAppContext();
+  const {
+    currentScreen,
+    fortuneType,
+    setCurrentScreen,
+  } = useAppStore();
 
-  if (!state.currentScreen.endsWith('-loading-screen')) return null;
+  if (!currentScreen.endsWith('-loading-screen')) return null;
 
   const handleComplete = () => {
-    setState(prev => ({ ...prev, currentScreen: 'result-screen' }));
+    setCurrentScreen('result-screen');
   };
 
   const renderLoadingAnimation = () => {
-    switch (state.fortuneType) {
+    switch (fortuneType) {
       case 'tarot':
         return (
           <TarotShuffle

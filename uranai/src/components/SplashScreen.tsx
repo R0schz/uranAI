@@ -1,11 +1,14 @@
 "use client";
 
-import { useAppContext } from '../contexts/AppContext';
+import { useAppStore } from '../contexts/AppContext';
 
 const SplashScreen = () => {
-  const { state, showModal } = useAppContext();
+  const {
+    currentScreen,
+    showModal,
+  } = useAppStore();
 
-  if (state.currentScreen !== 'splash-screen') return null;
+  if (currentScreen !== 'splash-screen') return null;
 
   const handleStartClick = () => {
     showModal('login');

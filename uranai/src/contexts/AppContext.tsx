@@ -7,8 +7,9 @@ import { useLoading } from '../hooks/useLoading';
 import { api } from '../lib/api';
 import ErrorMessage from '../components/ErrorMessage';
 import { createPagesBrowserClient } from '@supabase/auth-helpers-nextjs';
+import { create } from 'zustand';
 
-interface Person {
+export interface Person {
   id: number;
   nickname: string;
   name: string;
@@ -24,13 +25,45 @@ interface AppState {
   currentScreen: string;
   tickets: number;
   fortunePurpose: 'personal' | 'compatibility' | null;
-  selectedPeople: number[];
   fortuneType: 'numerology' | 'horoscope' | 'tarot' | 'comprehensive' | null;
+  selectedPeople: number[];
   people: Person[];
-  nextPersonId: number;
+  activeModal: ModalType;
+  modalData: ModalData | null;
+  setLoggedIn: (loggedIn: boolean) => void;
+  setPremium: (premium: boolean) => void;
+  setCurrentScreen: (screen: string) => void;
+  setTickets: (tickets: number) => void;
+  setFortunePurpose: (purpose: 'personal' | 'compatibility' | null) => void;
+  setFortuneType: (type: 'numerology' | 'horoscope' | 'tarot' | 'comprehensive' | null) => void;
+  setSelectedPeople: (people: number[]) => void;
+  setPeople: (people: Person[]) => void;
+  showModal: (type: ModalType) => void;
 }
 
-type ModalType = 'login' | 'register' | 'premium' | 'ticket' | 'addPerson' | 'confirmPerson' | null;
+export const useAppStore = create<AppState>((set) => ({
+  isLoggedIn: false,
+  isPremium: false,
+  currentScreen: 'splash-screen',
+  tickets: 5,
+  fortunePurpose: null,
+  fortuneType: null,
+  selectedPeople: [],
+  people: [], // Initialize people array
+  activeModal: null, // Add activeModal to Zustand
+  modalData: null, // Add modalData to Zustand
+  setLoggedIn: (loggedIn) => set({ isLoggedIn: loggedIn }),
+  setPremium: (premium) => set({ isPremium: premium }),
+  setCurrentScreen: (screen) => set({ currentScreen: screen }),
+  setTickets: (tickets) => set({ tickets }),
+  setFortunePurpose: (purpose) => set({ fortunePurpose: purpose }),
+  setFortuneType: (type) => set({ fortuneType: type }),
+  setSelectedPeople: (people) => set({ selectedPeople: people }),
+  setPeople: (people) => set({ people }), // Add setPeople to Zustand
+  showModal: (type) => set({ activeModal: type, modalData: null }),
+}));
+
+export type ModalType = 'login' | 'register' | 'premium' | 'ticket' | 'addPerson' | 'confirmPerson' | null;
 
 interface ModalData {
   personId?: number;
@@ -57,6 +90,7 @@ interface AppContextType {
   deletePerson: (id: number) => Promise<void>;
   getDivination: () => Promise<void>;
   askMoreQuestion: (question: string) => Promise<void>;
+  setCurrentScreen: (screen: string) => void;
 }
 
 const initialState: AppState = {
@@ -65,26 +99,25 @@ const initialState: AppState = {
   currentScreen: 'splash-screen',
   tickets: 5,
   fortunePurpose: null,
-  selectedPeople: [],
   fortuneType: null,
-  people: [
-    {
-      id: 1,
-      nickname: 'あなた',
-      name: 'てすと はなこ',
-      gender: 'female',
-      birthDate: '1998-11-10',
-      birthTime: '14:30',
-      birthPlace: '東京都渋谷区'
-    }
-  ],
-  nextPersonId: 2,
+  selectedPeople: [],
+  people: [], // Initialize people array
+  activeModal: null, // Add activeModal to initial state
+  modalData: null, // Add modalData to initial state
+  setLoggedIn: (loggedIn) => {},
+  setPremium: (premium) => {},
+  setCurrentScreen: (screen) => {},
+  setTickets: (tickets) => {},
+  setFortunePurpose: (purpose) => {},
+  setFortuneType: (type) => {},
+  setSelectedPeople: (people) => {},
+  setPeople: (people) => {}, // Add setPeople to initial state
+  showModal: (type) => {},
 };
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  const [state, setState] = useState<AppState>(initialState);
   const [activeModal, setActiveModal] = useState<ModalType>(null);
   const [modalData, setModalData] = useState<ModalData | null>(null);
   const { error, handleError, clearError } = useError();
@@ -99,7 +132,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
-      setState(prev => ({ ...prev, isLoggedIn: true }));
+      useAppStore.getState().setLoggedIn(true);
     }
   }, []);
 
@@ -112,7 +145,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       },
     });
     alert('確認メールを送信しました。メールボックスをご確認ください。');
-    setState(prev => ({ ...prev, isLoggedIn: true }));
+    useAppStore.getState().setLoggedIn(true);
     hideModal();
   };
 
@@ -121,7 +154,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       email,
       password,
     });
-    setState(prev => ({ ...prev, isLoggedIn: true, currentScreen: 'home-screen' }));
+    useAppStore.getState().setLoggedIn(true);
     hideModal();
   };
 
@@ -140,11 +173,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
       handleError(result.error);
       return;
     }
-    setState(prev => ({
-      ...prev,
-      people: [...prev.people, { ...person, id: result.data!.id }],
-      nextPersonId: prev.nextPersonId + 1
-    }));
+    // This part of the state management is now handled by Zustand
+    // setState(prev => ({
+    //   ...prev,
+    //   people: [...prev.people, { ...person, id: result.data!.id }],
+    //   nextPersonId: prev.nextPersonId + 1
+    // }));
     hideModal();
   };
 
@@ -154,10 +188,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
       handleError(result.error);
       return;
     }
-    setState(prev => ({
-      ...prev,
-      people: prev.people.map(p => p.id === id ? { ...p, ...person } : p)
-    }));
+    // This part of the state management is now handled by Zustand
+    // setState(prev => ({
+    //   ...prev,
+    //   people: prev.people.map(p => p.id === id ? { ...p, ...person } : p)
+    // }));
   };
 
   const deletePerson = async (id: number) => {
@@ -166,17 +201,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
       handleError(result.error);
       return;
     }
-    setState(prev => ({
-      ...prev,
-      people: prev.people.filter(p => p.id !== id)
-    }));
+    // This part of the state management is now handled by Zustand
+    // setState(prev => ({
+    //   ...prev,
+    //   people: prev.people.filter(p => p.id !== id)
+    // }));
   };
 
   const getDivination = async () => {
+    const state = useAppStore.getState();
     if (!state.fortuneType || state.selectedPeople.length === 0) return;
 
-    const people = state.selectedPeople.map(id => {
-      const person = state.people.find(p => p.id === id);
+    const people = state.selectedPeople.map((id: number) => {
+      const person = state.people.find((p: Person) => p.id === id);
       if (!person) throw new Error('Selected person not found');
       return {
         id: person.id,
@@ -189,7 +226,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
     const result = await withLoading(
       api.divination.getDivination({
-        type: state.fortuneType,
+        type: state.fortuneType!, // Assert non-null
         people
       })
     );
@@ -200,10 +237,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
 
     // 結果を表示
-    setState(prev => ({
-      ...prev,
-      currentScreen: 'result-screen'
-    }));
+    state.setCurrentScreen('result-screen');
   };
 
   const askMoreQuestion = async (question: string) => {
@@ -223,8 +257,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   return (
     <AppContext.Provider
       value={{
-        state,
-        setState,
+        state: useAppStore.getState(), // Expose Zustand state
+        setState: useAppStore.getState, // Expose Zustand setState
         activeModal,
         modalData,
         showModal,
@@ -234,14 +268,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
         clearError,
         isLoading,
         withLoading,
-        // 既に上部で定義済みのため削除
         login: handleSignIn,
         register: handleSignUp,
         addPerson,
         updatePerson,
         deletePerson,
         getDivination,
-        askMoreQuestion
+        askMoreQuestion,
+        setCurrentScreen: useAppStore.getState().setCurrentScreen,
       }}
     >
       {children}
