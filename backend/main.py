@@ -1,8 +1,3 @@
-from dotenv import load_dotenv
-
-# .env.localファイルを明示的に読み込む
-load_dotenv(dotenv_path='.env.local')
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from backend.auth import router as auth_router

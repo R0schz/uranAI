@@ -1,11 +1,14 @@
 "use client";
 
 import React, { useState } from 'react';
-import { useAppContext } from '../../contexts/AppContext';
+import { useAppContext, useAppStore } from '../../contexts/AppContext';
 import Modal from './Modal';
 
 const AddPersonModal = () => {
-  const { hideModal, addPerson } = useAppContext();
+  const { addPerson } = useAppContext();
+  // Zustandストアからモーダルを閉じる関数を取得
+  const { hideModal } = useAppStore();
+  
   const [nickname, setNickname] = useState('');
   const [name, setName] = useState('');
   const [birthDate, setBirthDate] = useState('');
@@ -21,19 +24,15 @@ const AddPersonModal = () => {
       setError('ニックネームは必須です');
       return;
     }
-
-    try {
-      await addPerson({
-        nickname,
-        name,
-        birthDate,
-        birthTime,
-        birthPlace,
-      });
-      hideModal();
-    } catch (err: any) {
-      setError(err.message || '人物の追加に失敗しました');
-    }
+    
+    // addPerson関数を呼び出す。成功すればAppContext内でモーダルが閉じられる。
+    await addPerson({
+      nickname,
+      name,
+      birthDate,
+      birthTime,
+      birthPlace,
+    });
   };
 
   return (

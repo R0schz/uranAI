@@ -1,7 +1,11 @@
+import os
 import stripe
 from fastapi import APIRouter, HTTPException
+from dotenv import load_dotenv
 
-stripe.api_key = "sk_test_51S0PU7AyQzk81ZkIaFYzuT2UtnY4WnjZ1vfRotTP24swQO0t7BwaecM8Ofeb0msIONwO2umjKTkJiG2hNDk8aNSd00swKNebXV"
+load_dotenv(dotenv_path='.env.local')
+
+stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
 
 router = APIRouter()
 
