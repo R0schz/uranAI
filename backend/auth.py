@@ -1,80 +1,41 @@
+import os
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from sqlalchemy.orm import Session
-from passlib.context import CryptContext
-from jose import JWTError, jwt
-from datetime import datetime, timedelta
-from .database import SessionLocal, User
-from kerykeion import AstrologicalSubject
+from supabase import create_client, Client
+from dotenv import load_dotenv
+
+# .env.localファイルを明示的に読み込む
+load_dotenv(dotenv_path='uranai/.env.local')
 
 router = APIRouter()
 
-SECRET_KEY = "c835962b4ca66e10cd470dfa17cde14b"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+SUPABASE_URL = os.getenv("NEXT_PUBLIC_SUPABASE_URL")
+# バックエンドでは強力なservice_roleキーを使います
+SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY") 
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
+# "tokenUrl"はダミーです。トークンはフロントがSupabaseから直接取得するため。
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(SessionLocal)):
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+@router.post("/current-user")
+def get_current_user(token: str = Depends(oauth2_scheme)):
+    """
+    ヘッダーからJWTを取得し、Supabaseに検証を依頼する。
+    有効なユーザーであればユーザー情報を返し、無効であれば例外を発生させる。
+    """
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        email: str = payload.get("sub")
-        if email is None:
-            raise credentials_exception
-    except JWTError:
-        raise credentials_exception
-    user = db.query(User).filter(User.email == email).first()
-    if user is None:
-        raise credentials_exception
-    return user
-
-def get_password_hash(password):
-    return pwd_context.hash(password)
-
-def verify_password(plain_password, hashed_password):
-    return pwd_context.verify(plain_password, hashed_password)
-
-def create_access_token(data: dict, expires_delta: timedelta = None):
-    to_encode = data.copy()
-    if expires_delta:
-        expire = datetime.utcnow() + expires_delta
-    else:
-        expire = datetime.utcnow() + timedelta(minutes=15)
-    to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-    return encoded_jwt
-
-@router.post("/register")
-async def register_user(email: str, password: str, db: Session = Depends(SessionLocal)):
-    hashed_password = get_password_hash(password)
-    user = User(email=email, hashed_password=hashed_password)
-    db.add(user)
-    db.commit()
-    db.refresh(user)
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(
-        data={"sub": user.email}, expires_delta=access_token_expires
-    )
-    return {"access_token": access_token, "token_type": "bearer"}
-
-@router.post("/login")
-async def login_user(email: str, password: str, db: Session = Depends(SessionLocal)):
-    user = db.query(User).filter(User.email == email).first()
-    if not user or not verify_password(password, user.hashed_password):
+        # 受け取ったJWTを使ってユーザー情報を取得
+        user_response = supabase.auth.get_user(token)
+        user = user_response.user
+        if user is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="User not found",
+            )
+        return user
+    except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect email or password",
+            detail="Invalid authentication credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(
-        data={"sub": user.email}, expires_delta=access_token_expires
-    )
-    return {"access_token": access_token, "token_type": "bearer"}

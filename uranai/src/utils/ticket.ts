@@ -4,7 +4,7 @@ export const getTicketCount = (): number => {
   return tickets;
 };
 
-export const useTicket = (): boolean => {
+export const consumeTicket = (): boolean => {
   if (tickets > 0) {
     tickets--;
     console.log('Ticket used. Remaining tickets:', tickets);

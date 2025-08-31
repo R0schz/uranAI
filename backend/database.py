@@ -18,7 +18,7 @@ import os
 # データベースURLを環境変数から取得（デフォルト値はローカル開発用）
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
-    "postgresql://user:password@localhost:5433/uranai"
+    "postgresql://user:password@localhost:5432/uranai"
 )
 
 # Renderのデータベース接続文字列を修正（必要な場合）

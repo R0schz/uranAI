@@ -1,6 +1,8 @@
+"use client";
+
 import React, { useState } from 'react';
 import { getPeople, addPerson, deletePerson } from '../utils/person';
-import { getTicketCount, useTicket, replenishTickets } from '../utils/ticket';
+import { getTicketCount, consumeTicket, replenishTickets } from '../utils/ticket';
 
 const MyPage: React.FC = () => {
   const [people, setPeople] = useState(getPeople());
@@ -26,7 +28,7 @@ const MyPage: React.FC = () => {
   };
 
   const handleUseTicket = () => {
-    if (useTicket()) {
+    if (consumeTicket()) {
       setTickets(getTicketCount());
       alert('Ticket used successfully.');
     } else {

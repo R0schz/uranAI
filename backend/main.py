@@ -1,14 +1,30 @@
+from dotenv import load_dotenv
+
+# .env.localファイルを明示的に読み込む
+load_dotenv(dotenv_path='.env.local')
+
 from fastapi import FastAPI
-from .auth import router as auth_router
-from .divination import router as divination_router
-from .stripe_integration import router as stripe_router
+from fastapi.middleware.cors import CORSMiddleware
+from backend.auth import router as auth_router
+from backend.divination import router as divination_router
+from backend.stripe_integration import router as stripe_router
 
 app = FastAPI()
 
-app.include_router(auth_router, prefix="/api/auth")
-app.include_router(divination_router, prefix="/api/divine")
-app.include_router(stripe_router, prefix="/api/payment")
+# CORS設定
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # 開発環境では全てのオリジンを許可
+    allow_credentials=True,
+    allow_methods=["*"],  # 全てのHTTPメソッドを許可
+    allow_headers=["*"],  # 全てのヘッダーを許可
+)
+
+# ルーターの登録
+app.include_router(auth_router)
+app.include_router(divination_router)
+app.include_router(stripe_router)
 
 @app.get("/")
-async def root():
+def read_root():
     return {"message": "Welcome to uranAI backend!"}

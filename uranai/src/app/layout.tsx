@@ -1,15 +1,16 @@
 import './globals.css';
-import { Inter } from 'next/font/google';
-import SplashScreen from './page';
-import LoginModal from '../components/LoginModal';
-import HomeScreen from '../components/HomeScreen';
-import PersonSelectScreen from '../components/PersonSelectScreen';
-import DivinationSelectScreen from '../components/DivinationSelectScreen';
-import InformationInputScreen from '../components/InformationInputScreen';
-import ResultScreen from '../components/ResultScreen';
-import MyPage from '../components/MyPage';
+import { Noto_Sans_JP, Shippori_Mincho } from 'next/font/google';
+import { AppProvider } from '../contexts/AppContext';
 
-const inter = Inter({ subsets: ['latin'] });
+const notoSansJP = Noto_Sans_JP({
+  subsets: ['latin'],
+  weight: ['300', '400', '700'],
+});
+
+const shipporiMincho = Shippori_Mincho({
+  subsets: ['latin'],
+  weight: ['400', '700'],
+});
 
 export const metadata = {
   title: 'uranAI',
@@ -22,17 +23,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        <SplashScreen />
-        <LoginModal />
-        <HomeScreen />
-        <PersonSelectScreen />
-        <DivinationSelectScreen />
-        <InformationInputScreen />
-        <ResultScreen />
-        <MyPage />
-        {children}
+    <html lang="ja">
+      <body className={`${notoSansJP.className} antialiased`}>
+        <AppProvider>
+          {children}
+        </AppProvider>
       </body>
     </html>
   );

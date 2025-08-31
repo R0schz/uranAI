@@ -1,35 +1,48 @@
+:root {
+  --bg-start: #1a1a2e;
+  --bg-mid: #16213e;
+  --bg-end: #0f3460;
+  --primary-start: #c850c0;
+  --primary-end: #4158d0;
+  --card-bg: rgba(255, 255, 255, 0.05);
+  --card-border: rgba(255, 255, 255, 0.1);
+  --header-height: 64px;
+  --nav-height: 80px;
+}
 body {
   font-family: 'Noto Sans JP', sans-serif;
   background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-mid) 50%, var(--bg-end) 100%);
   color: #e3e3e3;
   overflow-x: hidden;
 }
-
-.page {
-  min-height: calc(100vh - var(--header-height) - var(--nav-height));
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem;
+.font-serif-special { font-family: 'Shippori Mincho', serif; }
+#content-wrapper { padding-top: var(--header-height); padding-bottom: var(--nav-height); min-height: 100vh; box-sizing: border-box; }
+.page { min-height: calc(100vh - var(--header-height) - var(--nav-height)); width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.page.hidden { display: none; }
+.page-content { width: 100%; padding: 1rem; }
+#app-header, .nav-bar { background: rgba(15, 15, 25, 0.7); backdrop-filter: blur(10px); }
+#app-header { border-bottom: 1px solid var(--card-border); height: var(--header-height); }
+.nav-bar { border-top: 1px solid var(--card-border); height: var(--nav-height); }
+.nav-item.active { color: var(--primary-start); }
+.card { background: var(--card-bg); backdrop-filter: blur(12px); border: 1px solid var(--card-border); border-radius: 1.5rem; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); }
+.btn-primary { background: linear-gradient(45deg, var(--primary-start), var(--primary-end)); transition: all 0.3s ease; box-shadow: 0 4px 15px 0 rgba(65, 88, 208, 0.4); }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px 0 rgba(65, 88, 208, 0.5); }
+.btn-primary:disabled { background: #555; opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+.form-input, .form-textarea, .form-select { background: rgba(0, 0, 0, 0.2); border: 1px solid var(--card-border); color: #fff; border-radius: 0.75rem; transition: border-color 0.3s ease; -webkit-appearance: none; appearance: none; }
+.form-input:focus, .form-textarea:focus, .form-select:focus { outline: none; border-color: var(--primary-start); box-shadow: 0 0 0 2px rgba(200, 80, 192, 0.5); }
+.modal-overlay { background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px); }
+.stars-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; z-index: -1; }
+.star { position: absolute; background: #fff; border-radius: 50%; animation: twinkle 5s infinite; }
+@keyframes twinkle { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+.glow-filter { filter: drop-shadow(0 0 8px rgba(200, 80, 192, 0.7)); }
+.gradient-text { background: linear-gradient(45deg, var(--primary-start), var(--primary-end)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.tarot-shuffle-container { width: 250px; height: 250px; position: relative; display: flex; align-items: center; justify-content: center; }
+.tarot-shuffle-card { width: 50px; height: 88px; background-size: cover; background-position: center; border-radius: 6px; border: 1px solid rgba(255,255,255,0.5); position: absolute; top: calc(50% - 44px); left: calc(50% - 25px); transform-origin: center; animation: tarot-circle-shuffle 3.5s ease-in-out forwards; }
+@keyframes tarot-circle-shuffle {
+  0% { transform: rotate(0deg) translate(0) rotate(0deg); opacity: 1; }
+  50% { transform: rotate(720deg) translate(100px) rotate(-720deg); opacity: 1; }
+  100% { transform: rotate(0deg) translate(0) rotate(0deg); opacity: 0; }
 }
-
-@media (max-width: 768px) {
-  .page-content {
-    padding: 0.5rem;
-  }
-
-  .card {
-    padding: 1rem;
-  }
-
-  .btn-primary {
-    padding: 0.5rem 1rem;
-    font-size: 0.875rem;
-  }
-
-  .form-input, .form-textarea {
-    padding: 0.5rem;
-  }
-}
+.loading-canvas { display: block; margin: auto; }
+.spinner { border: 4px solid rgba(255, 255, 255, 0.3); border-left-color: #fff; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
