@@ -285,21 +285,27 @@ const supabase = createPagesBrowserClient({
           }
         }
         
+        // ローカルストレージにセッションがない場合でも、Supabaseのセッションチェックを実行
+        if (!savedSession) {
+          console.log('No saved session, but checking Supabase session...');
+        }
+        
         // Supabaseのセッションをチェック（タイムアウト付き）
         console.log('Checking Supabase session...');
         let session = null;
         
         try {
-          // タイムアウト付きでセッション取得
+          // タイムアウト付きでセッション取得（タイムアウト時間を2秒に短縮）
           const sessionPromise = supabase.auth.getSession();
           const timeoutPromise = new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('Session check timeout')), 3000)
+            setTimeout(() => reject(new Error('Session check timeout')), 2000)
           );
           
           const { data: { session: sessionData }, error } = await Promise.race([sessionPromise, timeoutPromise]) as any;
           
           if (error) {
             console.error('Error getting session:', error);
+            session = null;
           } else {
             session = sessionData;
           }
@@ -309,6 +315,10 @@ const supabase = createPagesBrowserClient({
           console.error('Exception getting session:', sessionError);
           // セッション取得に失敗した場合は、セッションなしとして処理
           session = null;
+          // タイムアウトエラーの場合は警告のみ表示
+          if (sessionError instanceof Error && sessionError.message === 'Session check timeout') {
+            console.warn('Session check timed out, continuing without session');
+          }
         }
         
         if (session?.user) {
@@ -337,6 +347,7 @@ const supabase = createPagesBrowserClient({
           console.log('No initial session found');
           // セッションがない場合は保存された状態をクリア
           useAppStore.getState().setLoggedIn(false);
+          // セッションがない場合はスプラッシュ画面のまま
           useAppStore.getState().setCurrentScreen('splash-screen');
           setProfiles([]);
         }
