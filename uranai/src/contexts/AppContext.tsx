@@ -5,7 +5,7 @@ import { useError } from '../hooks/useError';
 import { useLoading } from '../hooks/useLoading';
 import { api } from '../lib/api';
 import ErrorMessage from '../components/ErrorMessage';
-import { createPagesBrowserClient } from '@supabase/auth-helpers-nextjs';
+import { createBrowserClient } from '@supabase/ssr';
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 
@@ -157,7 +157,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 console.log('Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL);
 console.log('Supabase Key exists:', !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 
-const supabase = createPagesBrowserClient({
+const supabase = createBrowserClient({
   supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL!,
   supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
 });
