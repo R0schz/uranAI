@@ -10,9 +10,9 @@ from datetime import datetime
 from typing import List, Optional
 import json
 
-from database import SessionLocal, User, Profile, DivinationResult, Favorite
-from auth import get_current_user_id
-from divination_service import DivinationService
+from .database import SessionLocal, User, Profile, DivinationResult, Favorite
+from .auth import get_current_user_id
+from .divination_service import DivinationService
 
 app = FastAPI(title="uranAI Backend", version="1.0.0")
 
