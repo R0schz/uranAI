@@ -6,7 +6,16 @@ const HomeScreen = () => {
   // Zustandストアから直接状態と更新関数を取得
   const { currentScreen, setFortunePurpose, setSelectedPeople, setCurrentScreen } = useAppStore();
 
-  if (currentScreen !== 'home-screen') return null;
+  // デバッグ用: 現在の状態をコンソールに出力
+  console.log('HomeScreen - currentScreen:', currentScreen);
+
+  // デバッグ用: 一時的に条件を緩和
+  if (currentScreen !== 'home-screen' && currentScreen !== 'splash-screen') {
+    console.log('HomeScreen - returning null because currentScreen is not home-screen, currentScreen:', currentScreen);
+    return null;
+  }
+  
+  console.log('HomeScreen - rendering home screen content');
 
   const handlePurposeSelect = (purpose: 'personal' | 'compatibility') => {
     setFortunePurpose(purpose);
@@ -23,7 +32,7 @@ const HomeScreen = () => {
             onClick={() => handlePurposeSelect('personal')}
             className="card p-8 text-center cursor-pointer hover:border-purple-400 transition"
           >
-            <i data-lucide="user" className="w-16 h-16 mx-auto mb-4 text-purple-300"></i>
+            <i data-lucide="user-circle" className="w-16 h-16 mx-auto mb-4 text-purple-300"></i>
             <h3 className="font-serif-special text-2xl mb-2">パーソナル鑑定</h3>
             <p className="text-gray-400">
               あなた自身を<br />深く占います
@@ -33,7 +42,7 @@ const HomeScreen = () => {
             onClick={() => handlePurposeSelect('compatibility')}
             className="card p-8 text-center cursor-pointer hover:border-cyan-400 transition"
           >
-            <i data-lucide="users" className="w-16 h-16 mx-auto mb-4 text-cyan-300"></i>
+            <i data-lucide="heart" className="w-16 h-16 mx-auto mb-4 text-cyan-300"></i>
             <h3 className="font-serif-special text-2xl mb-2">相性占い</h3>
             <p className="text-gray-400">
               特定の人との相性を<br />占います

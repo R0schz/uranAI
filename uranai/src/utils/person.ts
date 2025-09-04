@@ -1,22 +1,22 @@
 interface Person {
   id: number;
   nickname: string;
-  name: string;
+  name_kana: string;
   gender: string;
-  birthDate: string;
-  birthTime: string;
-  birthPlace: string;
+  birth_date: string;
+  birth_time: string;
+  birth_place: string;
 }
 
 let people: Person[] = [
   {
     id: 1,
     nickname: 'あなた',
-    name: 'てすと はなこ',
+    name_kana: 'てすと はなこ',
     gender: 'female',
-    birthDate: '1998-11-10',
-    birthTime: '14:30',
-    birthPlace: '東京都渋谷区',
+    birth_date: '1998-11-10',
+    birth_time: '14:30',
+    birth_place: '東京都渋谷区',
   },
 ];
 

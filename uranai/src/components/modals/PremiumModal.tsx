@@ -1,11 +1,11 @@
 "use client";
 
 import React from 'react';
-import { useAppContext } from '../../contexts/AppContext';
+import { useAppStore } from '../../contexts/AppContext';
 import Modal from './Modal';
 
 const PremiumModal = () => {
-  const { hideModal } = useAppContext();
+  const { hideModal } = useAppStore();
 
   const handleSubscribe = () => {
     // TODO: Stripe決済フローを実装

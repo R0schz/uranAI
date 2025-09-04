@@ -1,23 +1,15 @@
 "use client";
 
 import React from 'react';
-import { useAppContext } from '../../contexts/AppContext';
+import { useAppContext, useAppStore, Profile } from '../../contexts/AppContext';
 import Modal from './Modal';
 
-interface Person {
-  id: number;
-  nickname: string;
-  name?: string;
-  birthDate?: string;
-  birthTime?: string;
-  birthPlace?: string;
-}
-
 const ConfirmPersonModal = () => {
-  const { hideModal, showModal, state } = useAppContext();
-  const selectedPerson = state.people.find(p => p.id === state.modalData?.personId);
+  const { hideModal } = useAppStore();
+  const { modalData, profiles } = useAppStore();
+  const selectedProfile = profiles.find(p => p.profile_id === modalData?.personId);
 
-  if (!selectedPerson) {
+  if (!selectedProfile) {
     hideModal();
     return null;
   }
@@ -41,25 +33,25 @@ const ConfirmPersonModal = () => {
     <Modal onClose={hideModal}>
       <div className="text-center">
         <div className="w-20 h-20 rounded-full bg-purple-900 flex items-center justify-center mx-auto mb-4">
-          <span className="text-3xl font-bold">{selectedPerson.nickname.charAt(0)}</span>
+          <span className="text-3xl font-bold">{selectedProfile.nickname.charAt(0)}</span>
         </div>
-        <h2 className="font-serif-special text-2xl mb-6">{selectedPerson.nickname}</h2>
+        <h2 className="font-serif-special text-2xl mb-6">{selectedProfile.nickname}</h2>
         <div className="space-y-4 mb-8">
           <div className="bg-black bg-opacity-20 p-4 rounded-lg">
             <p className="text-sm text-gray-400">名前（ひらがな）</p>
-            <p className="text-lg">{selectedPerson.name || '未設定'}</p>
+            <p className="text-lg">{selectedProfile.name_hiragana || '未設定'}</p>
           </div>
           <div className="bg-black bg-opacity-20 p-4 rounded-lg">
             <p className="text-sm text-gray-400">生年月日</p>
-            <p className="text-lg">{formatDate(selectedPerson.birthDate)}</p>
+            <p className="text-lg">{formatDate(selectedProfile.birth_date)}</p>
           </div>
           <div className="bg-black bg-opacity-20 p-4 rounded-lg">
             <p className="text-sm text-gray-400">出生時刻</p>
-            <p className="text-lg">{selectedPerson.birthTime || '未設定'}</p>
+            <p className="text-lg">{selectedProfile.birth_time || '未設定'}</p>
           </div>
           <div className="bg-black bg-opacity-20 p-4 rounded-lg">
             <p className="text-sm text-gray-400">出生地</p>
-            <p className="text-lg">{selectedPerson.birthPlace || '未設定'}</p>
+            <p className="text-lg">{selectedProfile.birth_location_json?.place || '未設定'}</p>
           </div>
         </div>
         <div className="space-y-3">

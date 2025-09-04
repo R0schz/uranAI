@@ -3,7 +3,6 @@ from sqlalchemy import (
     Column, 
     Integer, 
     String, 
-    Boolean, 
     ForeignKey, 
     TIMESTAMP,
     Date,
@@ -14,14 +13,15 @@ from sqlalchemy import (
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 import os
+from dotenv import load_dotenv
 
-# データベースURLを環境変数から取得（デフォルト値はローカル開発用）
+# .env.localファイルを読み込む（backendディレクトリから実行するため、相対パスに変更）
+load_dotenv(dotenv_path='.env.local')
+
+# SupabaseのPostgreSQL接続URL
 DATABASE_URL = os.getenv(
-    "DATABASE_URL",
-    "postgresql://user:password@localhost:5432/uranai"
+    "DATABASE_URL"
 )
-
-# Renderのデータベース接続文字列を修正（必要な場合）
 if DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
@@ -29,42 +29,47 @@ engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
-# モデルの定義
+# ▼▼▼ モデルの定義を修正 ▼▼▼
 class User(Base):
     __tablename__ = "users"
-    id = Column(Integer, primary_key=True, index=True)
+    # SupabaseのUUIDを保存するため、idをString型に変更
+    user_id = Column(String, primary_key=True, index=True)
     email = Column(String, unique=True, index=True)
-    hashed_password = Column(String)
-    plan = Column(String, default="free")
-    tickets = Column(Integer, default=5)
+    password_hash = Column(String, nullable=True)  # ソーシャルログインの場合はnull
+    auth_provider = Column(String, default="email")  # email, google, x等
+    plan_type = Column(String, default="Free")  # Free, Premium
+    ticket_balance = Column(Integer, default=5)
     stripe_customer_id = Column(String, nullable=True)
     created_at = Column(TIMESTAMP)
     updated_at = Column(TIMESTAMP)
 
-    people = relationship("Person", back_populates="owner")
+    profiles = relationship("Profile", back_populates="owner")
     divination_results = relationship("DivinationResult", back_populates="owner")
+    favorites = relationship("Favorite", back_populates="owner")
 
-class Person(Base):
-    __tablename__ = "people"
+class Profile(Base):
+    __tablename__ = "profiles"
 
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"))
+    profile_id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(String, ForeignKey("users.user_id"))
     nickname = Column(String)
-    name_kana = Column(String, nullable=True)
+    name_hiragana = Column(String, nullable=True)
     gender = Column(String, nullable=True)
     birth_date = Column(Date, nullable=True)
     birth_time = Column(Time, nullable=True)
-    birth_place = Column(String, nullable=True)
+    birth_location_json = Column(JSON, nullable=True)  # 出生地の詳細情報をJSONで保存
+    is_self_flag = Column(String, default="false")  # 自分自身のプロフィールかどうか
     created_at = Column(TIMESTAMP)
     updated_at = Column(TIMESTAMP)
 
-    owner = relationship("User", back_populates="people")
+    owner = relationship("User", back_populates="profiles")
 
 class DivinationResult(Base):
     __tablename__ = "divination_results"
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"))
+    # user_idもString型に変更
+    user_id = Column(String, ForeignKey("users.user_id"))
     fortune_type = Column(String)
     request_data = Column(JSON)
     visual_result = Column(JSON)
@@ -73,4 +78,15 @@ class DivinationResult(Base):
 
     owner = relationship("User", back_populates="divination_results")
 
-Base.metadata.create_all(bind=engine)
+class Favorite(Base):
+    __tablename__ = "favorites"
+
+    favorite_id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(String, ForeignKey("users.user_id"))
+    divination_result_json = Column(JSON)  # お気に入り登録した占い結果のJSON
+    created_at = Column(TIMESTAMP)
+
+    owner = relationship("User", back_populates="favorites")
+
+# テーブル作成を有効化（順序を指定）
+# Base.metadata.create_all(bind=engine)

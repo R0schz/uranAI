@@ -20,7 +20,7 @@ const Navigation = () => {
           currentScreen === 'home-screen' ? 'active' : ''
         }`}
       >
-        <i data-lucide="home" className="w-7 h-7 mx-auto"></i>
+        <i data-lucide="compass" className="w-7 h-7 mx-auto"></i>
         <span className="text-xs">ホーム</span>
       </div>
       <div
@@ -29,7 +29,7 @@ const Navigation = () => {
           currentScreen === 'mypage-screen' ? 'active' : ''
         }`}
       >
-        <i data-lucide="user-circle" className="w-7 h-7 mx-auto"></i>
+        <i data-lucide="user" className="w-7 h-7 mx-auto"></i>
         <span className="text-xs">マイページ</span>
       </div>
     </nav>

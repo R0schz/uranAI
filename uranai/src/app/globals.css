@@ -79,11 +79,172 @@ body {
     background: linear-gradient(45deg, var(--primary-start), var(--primary-end)); 
     transition: all 0.3s ease; 
     box-shadow: 0 4px 15px 0 rgba(65, 88, 208, 0.4); 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
 }
 
 .btn-primary:hover { 
     transform: translateY(-2px); 
     box-shadow: 0 6px 20px 0 rgba(65, 88, 208, 0.5); 
+}
+
+/* 全てのボタンのテキスト中央配置を統一（サイズは変更しない） */
+button {
+    text-align: center !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* ボタン内のテキストノードも中央配置 */
+button:not(:empty) {
+    text-align: center !important;
+}
+
+/* 全てのボタンのテキストを強制的に中央配置 */
+button {
+    text-align: center !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* ボタン内の全ての要素を中央配置 */
+button * {
+    text-align: center !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* ボタン内のテキストとアイコンの中央配置を強化 */
+button i {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+}
+
+/* ボタン内のテキストの中央配置を確実にする */
+button span {
+    text-align: center !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* 特定のボタンスタイルを強化（サイズは変更しない） */
+.btn-primary, .bg-gray-700, .bg-cyan-600, .bg-purple-600, .bg-red-600, .bg-yellow-500 {
+    text-align: center !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+/* ボタン内のテキストを中央配置 */
+.btn-primary *, .bg-gray-700 *, .bg-cyan-600 *, .bg-purple-600 *, .bg-red-600 *, .bg-yellow-500 * {
+    text-align: center !important;
+}
+
+/* 鑑定するボタンの中央配置を強化 */
+.btn-primary {
+    text-align: center !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+.btn-primary * {
+    text-align: center !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* 鑑定ボタンのテキストを強制的に中央配置 */
+button.btn-primary {
+    text-align: center !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+button.btn-primary * {
+    text-align: center !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* 共有ボタンと追加質問ボタンの中央配置を強化 */
+.bg-cyan-600, .bg-purple-600 {
+    text-align: center !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+.bg-cyan-600 *, .bg-purple-600 * {
+    text-align: center !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* 共有ボタンと追加質問ボタンのテキストを強制的に中央配置 */
+button.bg-cyan-600, button.bg-purple-600 {
+    text-align: center !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+button.bg-cyan-600 *, button.bg-purple-600 * {
+    text-align: center !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* 戻るボタンも中央配置（サイズは変更しない） */
+button.text-gray-400 {
+    text-align: center !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+/* 戻るボタン内のテキストも中央配置 */
+button.text-gray-400 * {
+    text-align: center !important;
+}
+
+/* 戻るボタンのスタイル */
+.btn-back {
+    background: rgba(75, 85, 99, 0.8);
+    color: white;
+    border: 1px solid rgba(75, 85, 99, 0.5);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.btn-back:hover {
+    background: rgba(75, 85, 99, 1);
+    border-color: rgba(75, 85, 99, 0.8);
+    transform: translateY(-1px);
 }
 
 .form-input, .form-textarea { 
@@ -139,32 +300,94 @@ body {
 
 /* Tarot Circular Shuffle Animation */
 .tarot-shuffle-container { 
-    width: 250px; 
-    height: 250px; 
+    width: 300px; 
+    height: 300px; 
     position: relative; 
     display: flex; 
     align-items: center; 
     justify-content: center; 
+    margin: 20px auto;
 }
 
 .tarot-shuffle-card { 
-    width: 50px; 
-    height: 88px; 
+    width: 58px; 
+    height: 101px; 
     background-size: cover; 
     background-position: center; 
-    border-radius: 6px; 
-    border: 1px solid rgba(255,255,255,0.5); 
+    background-repeat: no-repeat;
+    border-radius: 8px; 
+    border: 2px solid rgba(255,255,255,0.3); 
     position: absolute; 
-    top: calc(50% - 44px); 
-    left: calc(50% - 25px); 
+    top: calc(50% - 50.5px); 
+    left: calc(50% - 29px); 
     transform-origin: center; 
-    animation: tarot-circle-shuffle 3.5s ease-in-out forwards; 
+    animation: tarot-circle-shuffle 4s ease-in-out forwards; 
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3), 0 0 20px rgba(255,255,255,0.1);
+    transition: all 0.3s ease;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.tarot-shuffle-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.4), 0 0 30px rgba(255,255,255,0.2);
 }
 
 @keyframes tarot-circle-shuffle {
-    0% { transform: rotate(0deg) translate(0) rotate(0deg); opacity: 1; }
-    50% { transform: rotate(720deg) translate(100px) rotate(-720deg); opacity: 1; }
-    100% { transform: rotate(0deg) translate(0) rotate(0deg); opacity: 0; }
+    0% { 
+        transform: rotate(0deg) translate(0) rotate(0deg); 
+        opacity: 1; 
+        scale: 1;
+    }
+    25% { 
+        transform: rotate(180deg) translate(50px) rotate(-180deg); 
+        opacity: 0.9; 
+        scale: 1.1;
+    }
+    50% { 
+        transform: rotate(720deg) translate(120px) rotate(-720deg); 
+        opacity: 0.8; 
+        scale: 1.2;
+    }
+    75% { 
+        transform: rotate(1080deg) translate(80px) rotate(-1080deg); 
+        opacity: 0.7; 
+        scale: 1.1;
+    }
+    100% { 
+        transform: rotate(1440deg) translate(0) rotate(-1440deg); 
+        opacity: 0; 
+        scale: 0.8;
+    }
+}
+
+/* 追加のエフェクト */
+.tarot-shuffle-container::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 200px;
+    height: 200px;
+    border: 2px solid rgba(255,255,255,0.1);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    animation: pulse-ring 2s ease-in-out infinite;
+}
+
+@keyframes pulse-ring {
+    0% { 
+        transform: translate(-50%, -50%) scale(0.8); 
+        opacity: 0.8; 
+    }
+    50% { 
+        transform: translate(-50%, -50%) scale(1.2); 
+        opacity: 0.3; 
+    }
+    100% { 
+        transform: translate(-50%, -50%) scale(0.8); 
+        opacity: 0.8; 
+    }
 }
 
 /* Horoscope & Numerology Canvas */

@@ -1,23 +1,24 @@
 "use client";
 
-import { useAppContext } from '../contexts/AppContext';
+import { useAppStore } from '../contexts/AppContext';
 
 const DivinationSelectScreen = () => {
-  const { state, setState } = useAppContext();
+  const { currentScreen, isPremium, setCurrentScreen, setFortuneType } = useAppStore();
 
-  if (state.currentScreen !== 'fortune-type-screen') return null;
+  if (currentScreen !== 'fortune-type-screen') return null;
 
   const handleFortuneTypeSelect = (type: 'numerology' | 'horoscope' | 'tarot' | 'comprehensive', isPremium?: boolean) => {
-    if (isPremium && !state.isPremium) {
+    if (isPremium && !isPremium) {
       // Show premium modal
       return;
     }
 
-    setState(prev => ({
-      ...prev,
-      fortuneType: type,
-      currentScreen: 'input-screen'
-    }));
+    setFortuneType(type);
+    setCurrentScreen('input-screen');
+  };
+
+  const handleBack = () => {
+    setCurrentScreen('person-select-screen');
   };
 
   return (
@@ -29,7 +30,7 @@ const DivinationSelectScreen = () => {
             onClick={() => handleFortuneTypeSelect('numerology')}
             className="card p-6 text-center cursor-pointer hover:border-purple-400 transition"
           >
-            <i data-lucide="binary" className="w-12 h-12 mx-auto mb-3 text-purple-300"></i>
+            <i data-lucide="hash" className="w-12 h-12 mx-auto mb-3 text-purple-300"></i>
             <h3 className="font-serif-special text-xl mb-1">数秘術</h3>
             <p className="text-sm text-gray-400">
               生年月日と名前から<br />運命を解読
@@ -39,7 +40,7 @@ const DivinationSelectScreen = () => {
             onClick={() => handleFortuneTypeSelect('horoscope')}
             className="card p-6 text-center cursor-pointer hover:border-cyan-400 transition"
           >
-            <i data-lucide="orbit" className="w-12 h-12 mx-auto mb-3 text-cyan-300"></i>
+            <i data-lucide="star" className="w-12 h-12 mx-auto mb-3 text-cyan-300"></i>
             <h3 className="font-serif-special text-xl mb-1">西洋占星術</h3>
             <p className="text-sm text-gray-400">
               星々の配置が示す<br />あなたの全て
@@ -49,7 +50,7 @@ const DivinationSelectScreen = () => {
             onClick={() => handleFortuneTypeSelect('tarot')}
             className="card p-6 text-center cursor-pointer hover:border-yellow-400 transition"
           >
-            <i data-lucide="layout-template" className="w-12 h-12 mx-auto mb-3 text-yellow-300"></i>
+            <i data-lucide="layers" className="w-12 h-12 mx-auto mb-3 text-yellow-300"></i>
             <h3 className="font-serif-special text-xl mb-1">タロット</h3>
             <p className="text-sm text-gray-400">
               カードが導く<br />未来へのメッセージ
@@ -70,6 +71,14 @@ const DivinationSelectScreen = () => {
               全ての占術で<br />多角的に鑑定
             </p>
           </div>
+        </div>
+        <div className="mt-8 text-center">
+          <button
+            onClick={handleBack}
+            className="text-gray-400 hover:text-white text-sm underline mx-auto"
+          >
+            ← 人物選択に戻る
+          </button>
         </div>
       </div>
     </section>

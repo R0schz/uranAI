@@ -45,3 +45,6 @@ uvicorn==0.35.0
 websockets==15.0.1
 supabase==2.18.1
 python-dotenv==1.1.1
+groq==0.4.1
+pykakasi==2.2.1
+googlemaps==4.10.0

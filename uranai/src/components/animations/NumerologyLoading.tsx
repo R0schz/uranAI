@@ -8,7 +8,7 @@ interface NumerologyLoadingProps {
 
 const NumerologyLoading = ({ onComplete }: NumerologyLoadingProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const intervalIdRef = useRef<NodeJS.Timeout>();
+  const intervalIdRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -24,10 +24,11 @@ const NumerologyLoading = ({ onComplete }: NumerologyLoadingProps) => {
     const fontSize = 16;
     const columns = canvas.width / fontSize;
     const drops = Array.from({ length: Math.floor(columns) }).map(() =>
-      1 + Math.floor(Math.random() * 250)
+      1 + Math.floor(Math.random() * 800)
     );
 
     function draw() {
+      if (!ctx || !canvas) return;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.fillStyle = '#c850c0';
       ctx.font = `${fontSize}px monospace`;
@@ -45,7 +46,7 @@ const NumerologyLoading = ({ onComplete }: NumerologyLoadingProps) => {
 
     intervalIdRef.current = setInterval(draw, 33);
 
-    const timer = setTimeout(onComplete, 3500);
+    const timer = setTimeout(onComplete, 5000);
 
     return () => {
       if (intervalIdRef.current) {

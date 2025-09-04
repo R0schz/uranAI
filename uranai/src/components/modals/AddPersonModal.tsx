@@ -5,7 +5,7 @@ import { useAppContext, useAppStore } from '../../contexts/AppContext';
 import Modal from './Modal';
 
 const AddPersonModal = () => {
-  const { addPerson } = useAppContext();
+  const { addProfile } = useAppContext();
   // Zustandストアからモーダルを閉じる関数を取得
   const { hideModal } = useAppStore();
   
@@ -25,13 +25,18 @@ const AddPersonModal = () => {
       return;
     }
     
-    // addPerson関数を呼び出す。成功すればAppContext内でモーダルが閉じられる。
-    await addPerson({
+    // デフォルト値の設定
+    const finalBirthTime = birthTime || '12:00';
+    const finalBirthPlace = birthPlace || '東京都中央区';
+    
+    // addProfile関数を呼び出す。成功すればAppContext内でモーダルが閉じられる。
+    await addProfile({
       nickname,
-      name,
-      birthDate,
-      birthTime,
-      birthPlace,
+      name_hiragana: name,  // フィールド名を統一
+      birth_date: birthDate,  // フィールド名を統一
+      birth_time: finalBirthTime,  // フィールド名を統一
+      birth_location_json: { place: finalBirthPlace },  // フィールド名を統一
+      is_self_flag: false,  // デフォルト値
     });
   };
 
@@ -62,6 +67,7 @@ const AddPersonModal = () => {
             onChange={(e) => setName(e.target.value)}
             placeholder="例: やまだ はなこ"
             className="form-input w-full p-3"
+            required
           />
         </div>
         <div>
@@ -73,6 +79,7 @@ const AddPersonModal = () => {
             value={birthDate}
             onChange={(e) => setBirthDate(e.target.value)}
             className="form-input w-full p-3"
+            required
           />
         </div>
         <div>
@@ -102,8 +109,7 @@ const AddPersonModal = () => {
         <div className="pt-4">
           <button
             type="submit"
-            className="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 rounded-full transition"
-          >
+            className="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 rounded-full transition">
             登録する
           </button>
         </div>

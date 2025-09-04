@@ -4,12 +4,12 @@ from dotenv import load_dotenv
 
 load_dotenv(dotenv_path='.env.local')
 
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+GOOGLE_GEMINI_API_KEY = os.getenv("GOOGLE_GEMINI_API_KEY")
 
-client = genai.Client(api_key=GEMINI_API_KEY)
+client = genai.Client(api_key=GOOGLE_GEMINI_API_KEY)
 
 def generate_narrative(prompt: str) -> str:
     response = client.models.generate_content(
-        model="gemini-2.5-flash", contents=prompt
+        model="models/gemini-2.5-flash-lite", contents=prompt
     )
     return response.text

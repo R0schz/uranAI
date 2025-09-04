@@ -1,41 +1,86 @@
+import jwt
 import os
-from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
-from supabase import create_client, Client
+from datetime import datetime, timezone
+from fastapi import HTTPException, Depends, status
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from dotenv import load_dotenv
 
-# .env.localファイルを明示的に読み込む
-load_dotenv(dotenv_path='uranai/.env.local')
+# .env.localファイルを読み込む（backendディレクトリから実行するため、相対パスに変更）
+load_dotenv(dotenv_path='.env.local')
 
-router = APIRouter()
+# SupabaseのJWT_SECRETを使用
+JWT_SECRET = os.getenv("JWT_SECRET")
 
-SUPABASE_URL = os.getenv("NEXT_PUBLIC_SUPABASE_URL")
-# バックエンドでは強力なservice_roleキーを使います
-SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY") 
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+security = HTTPBearer()
 
-# "tokenUrl"はダミーです。トークンはフロントがSupabaseから直接取得するため。
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-
-@router.post("/current-user")
-def get_current_user(token: str = Depends(oauth2_scheme)):
+async def verify_jwt_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
     """
-    ヘッダーからJWTを取得し、Supabaseに検証を依頼する。
-    有効なユーザーであればユーザー情報を返し、無効であれば例外を発生させる。
+    SupabaseのJWTトークンを検証し、ユーザーIDを返す
     """
     try:
-        # 受け取ったJWTを使ってユーザー情報を取得
-        user_response = supabase.auth.get_user(token)
-        user = user_response.user
-        if user is None:
+        token = credentials.credentials
+        print(f"Received token: {token[:20]}...")  # トークンの最初の20文字を表示
+        
+        # JWTトークンをデコード（Supabaseの形式に合わせる）
+        # audienceチェックを無効化し、より柔軟な検証を行う
+        payload = jwt.decode(
+            token, 
+            JWT_SECRET, 
+            algorithms=["HS256"],
+            options={
+                "verify_signature": True,
+                "verify_aud": False,  # audienceチェックを無効化
+                "verify_iss": False,  # issuerチェックも無効化（必要に応じて）
+            }
+        )
+        
+        print(f"JWT payload: {payload}")  # ペイロードの内容を表示
+        
+        # SupabaseのJWTトークンからユーザーIDを取得
+        user_id = payload.get("sub")
+        if not user_id:
+            print("User ID not found in token payload")
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="User not found",
+                detail="Invalid token: missing user ID"
             )
-        return user
-    except Exception as e:
+        
+        print(f"Extracted user ID: {user_id}")
+        
+        # トークンの有効期限をチェック（標準的なPythonのdatetimeを使用）
+        exp = payload.get("exp")
+        if exp:
+            current_timestamp = int(datetime.now(timezone.utc).timestamp())
+            if current_timestamp > exp:
+                print("Token has expired")
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Token has expired"
+                )
+        
+        return user_id
+        
+    except jwt.ExpiredSignatureError:
+        print("JWT ExpiredSignatureError")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid authentication credentials",
-            headers={"WWW-Authenticate": "Bearer"},
+            detail="Token has expired"
         )
+    except jwt.InvalidTokenError as e:
+        print(f"JWT validation error: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token"
+        )
+    except Exception as e:
+        print(f"Authentication error: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=f"Authentication failed: {str(e)}"
+        )
+
+def get_current_user_id(user_id: str = Depends(verify_jwt_token)):
+    """
+    現在のユーザーIDを取得する依存関数
+    """
+    return user_id

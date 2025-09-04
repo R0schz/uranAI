@@ -12,26 +12,36 @@ const LoadingScreen = () => {
     setCurrentScreen,
   } = useAppStore();
 
-  if (!currentScreen.endsWith('-loading-screen')) return null;
+  console.log('LoadingScreen: currentScreen =', currentScreen, 'fortuneType =', fortuneType);
+
+  if (!currentScreen.endsWith('-loading-screen')) {
+    console.log('LoadingScreen: Not a loading screen, returning null');
+    return null;
+  }
 
   const handleComplete = () => {
+    console.log('LoadingScreen: handleComplete called, setting screen to result-screen');
     setCurrentScreen('result-screen');
   };
 
   const renderLoadingAnimation = () => {
+    console.log('LoadingScreen: renderLoadingAnimation called for fortuneType =', fortuneType);
     switch (fortuneType) {
       case 'tarot':
+        console.log('LoadingScreen: Rendering TarotShuffle');
         return (
           <TarotShuffle
             onComplete={handleComplete}
-            cardBackUrl="https://placehold.co/100/176/1a1a2e/c850c0?text=uranAI"
           />
         );
       case 'horoscope':
+        console.log('LoadingScreen: Rendering HoroscopeLoading');
         return <HoroscopeLoading onComplete={handleComplete} />;
       case 'numerology':
+        console.log('LoadingScreen: Rendering NumerologyLoading');
         return <NumerologyLoading onComplete={handleComplete} />;
       default:
+        console.log('LoadingScreen: Rendering default loading');
         return (
           <div className="page-content flex flex-col items-center justify-center">
             <p className="font-serif-special text-xl text-gray-200 animate-pulse">

@@ -1,11 +1,11 @@
 "use client";
 
 import React from 'react';
-import { useAppContext } from '../../contexts/AppContext';
+import { useAppStore } from '../../contexts/AppContext';
 import Modal from './Modal';
 
 const TicketModal = () => {
-  const { hideModal, showModal } = useAppContext();
+  const { hideModal, showModal } = useAppStore();
 
   const handleWatchAd = () => {
     // TODO: 広告視聴ロジックを実装

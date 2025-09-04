@@ -1,30 +1,20 @@
 "use client";
 
 import React, { useState } from 'react';
-import { getPeople, addPerson, deletePerson } from '../utils/person';
+import { useAppStore, useAppContext } from '../contexts/AppContext';
 import { getTicketCount, consumeTicket, replenishTickets } from '../utils/ticket';
 
 const MyPage: React.FC = () => {
-  const [people, setPeople] = useState(getPeople());
+  const { profiles, showModal } = useAppStore();
+  const { addProfile, deleteProfile } = useAppContext();
   const [tickets, setTickets] = useState(getTicketCount());
 
   const handleAddPerson = () => {
-    const newPerson = {
-      id: people.length + 1,
-      nickname: '新しい人',
-      name: '',
-      gender: 'unknown',
-      birthDate: '',
-      birthTime: '',
-      birthPlace: '',
-    };
-    addPerson(newPerson);
-    setPeople(getPeople());
+    showModal('addPerson');
   };
 
   const handleDeletePerson = (id: number) => {
-    deletePerson(id);
-    setPeople(getPeople());
+    deleteProfile(id);
   };
 
   const handleUseTicket = () => {
@@ -70,16 +60,16 @@ const MyPage: React.FC = () => {
               <i data-lucide="plus" className="w-5 h-5"></i>
             </button>
           </div>
-          <p className="text-sm text-gray-400 mb-4">登録人数: <span id="person-count-info">{people.length} / 3</span></p>
+          <p className="text-sm text-gray-400 mb-4">登録人数: <span id="person-count-info">{profiles.length} / 3</span></p>
           <div id="mypage-person-list" className="space-y-3">
-            {people.map((person) => (
-              <div key={person.id} className="bg-black bg-opacity-20 p-3 rounded-lg flex items-center justify-between">
-                <p>{person.nickname}</p>
+            {profiles.map((profile) => (
+              <div key={profile.profile_id} className="bg-black bg-opacity-20 p-3 rounded-lg flex items-center justify-between">
+                <p>{profile.nickname}</p>
                 <div>
                   <button className="text-gray-400 hover:text-white p-1">
                     <i data-lucide="edit" className="w-4 h-4"></i>
                   </button>
-                  <button onClick={() => handleDeletePerson(person.id)} className="text-gray-400 hover:text-red-500 p-1">
+                  <button onClick={() => handleDeletePerson(profile.profile_id)} className="text-gray-400 hover:text-red-500 p-1">
                     <i data-lucide="trash-2" className="w-4 h-4"></i>
                   </button>
                 </div>

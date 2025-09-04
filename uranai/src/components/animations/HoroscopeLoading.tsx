@@ -8,7 +8,7 @@ interface HoroscopeLoadingProps {
 
 const HoroscopeLoading = ({ onComplete }: HoroscopeLoadingProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animationFrameIdRef = useRef<number>();
+  const animationFrameIdRef = useRef<number | undefined>(undefined);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -20,7 +20,7 @@ const HoroscopeLoading = ({ onComplete }: HoroscopeLoadingProps) => {
     canvas.width = 300;
     canvas.height = 300;
 
-    let stars: Array<{
+    const stars: Array<{
       x: number;
       y: number;
       radius: number;
@@ -42,6 +42,7 @@ const HoroscopeLoading = ({ onComplete }: HoroscopeLoadingProps) => {
     }
 
     function draw() {
+      if (!ctx || !canvas) return;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       stars.forEach(star => {
@@ -63,7 +64,7 @@ const HoroscopeLoading = ({ onComplete }: HoroscopeLoadingProps) => {
 
     draw();
 
-    const timer = setTimeout(onComplete, 3500);
+    const timer = setTimeout(onComplete, 5000);
 
     return () => {
       if (animationFrameIdRef.current) {
