@@ -8,7 +8,7 @@ import random
 import json
 import concurrent.futures
 from datetime import datetime
-from tarot_data import get_full_tarot_deck, TarotCard, get_card_meaning, get_card_keywords, get_card_image_path, get_reversed_meaning
+from .tarot_data import get_full_tarot_deck, TarotCard, get_card_meaning, get_card_keywords, get_card_image_path, get_reversed_meaning
 
 class TarotPosition:
     """タロット位置クラス"""

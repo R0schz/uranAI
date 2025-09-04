@@ -10,7 +10,7 @@ from kerykeion import AstrologicalSubject, KerykeionChartSVG
 import json
 import base64
 import io
-from geocoding import GeocodingService
+from .geocoding import GeocodingService
 
 class HoroscopeCalculator:
     """西洋占星術計算クラス"""

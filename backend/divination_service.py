@@ -4,10 +4,10 @@
 """
 
 from typing import Dict, Any, List
-from numerology_calculator import NumerologyCalculator
-from horoscope import HoroscopeCalculator
-from tarot import TarotCalculator
-from ai_analysis import AIAnalysisGenerator
+from .numerology_calculator import NumerologyCalculator
+from .horoscope import HoroscopeCalculator
+from .tarot import TarotCalculator
+from .ai_analysis import AIAnalysisGenerator
 import json
 import asyncio
 import concurrent.futures
