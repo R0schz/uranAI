@@ -5,7 +5,7 @@ import { useError } from '../hooks/useError';
 import { useLoading } from '../hooks/useLoading';
 import { api } from '../lib/api';
 import ErrorMessage from '../components/ErrorMessage';
-import { createBrowserClient } from '@supabase/ssr';
+import { createClient } from '../lib/supabase';
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 
@@ -157,10 +157,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
 console.log('Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL);
 console.log('Supabase Key exists:', !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 
-const supabase = createBrowserClient({
-  supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://kkbhpbbjudjbwxnwpieg.supabase.co',
-  supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtrYmhwYmJqdWRqYnd4bndwaWVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ5NzQ4NzQsImV4cCI6MjA1MDU1MDg3NH0.placeholder',
-});
+const supabase = createClient();
+
+// Supabaseクライアントが利用できない場合は早期リターン
+if (!supabase) {
+  console.warn('Supabase client not available in server environment');
+}
 
   // プロフィールデータをデータベースから取得する関数
   const loadProfiles = useCallback(async () => {
