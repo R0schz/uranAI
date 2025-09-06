@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
 
   // 認証コードがあればセッションと交換
   if (code) {
-    const supabase = createSupabaseServerClient();
+    const supabase = await createSupabaseServerClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (!error) {

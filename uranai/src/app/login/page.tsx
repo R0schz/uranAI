@@ -1,6 +1,6 @@
 'use client'
 
-import { createClient } from '../../lib/supabase'
+import { createSupabaseBrowserClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
@@ -10,9 +10,10 @@ export default function LoginPage() {
   const router = useRouter()
 
   // クライアントコンポーネント用のSupabaseクライアントを作成
-  const supabase = createClient()
+  const supabase = createSupabaseBrowserClient()
 
   const handleSignUp = async () => {
+    if (!supabase) return;
     await supabase.auth.signUp({
       email,
       password,
@@ -25,6 +26,7 @@ export default function LoginPage() {
   }
 
   const handleSignIn = async () => {
+    if (!supabase) return;
     await supabase.auth.signInWithPassword({
       email,
       password,
@@ -33,6 +35,7 @@ export default function LoginPage() {
   }
 
   const handleOAuthSignIn = async (provider: 'google' | 'twitter' | 'facebook') => {
+    if (!supabase) return;
     await supabase.auth.signInWithOAuth({
       provider,
       options: {

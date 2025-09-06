@@ -1,6 +1,6 @@
-import { createClient } from './supabase';
+import { createSupabaseBrowserClient } from './supabase/client';
 
-const supabase = createClient();
+const supabase = createSupabaseBrowserClient();
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 

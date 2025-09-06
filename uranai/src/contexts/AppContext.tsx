@@ -1,15 +1,11 @@
 "use client"; // 必ずファイルの先頭に記述
 
-import { createSupabaseBrowserClient } from '@/lib/supabase/client'; // パスは適宜調整
-import { createContext, useContext, useState } from 'react';
-
-// ...コンテキストのコード...
-// const supabase = createSupabaseBrowserClient();
+import { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
 import { useError } from '../hooks/useError';
 import { useLoading } from '../hooks/useLoading';
 import { api } from '../lib/api';
 import ErrorMessage from '../components/ErrorMessage';
-import { createClient } from '../lib/supabase';
+import { createSupabaseBrowserClient } from '../lib/supabase/client';
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 
@@ -161,7 +157,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 console.log('Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL);
 console.log('Supabase Key exists:', !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 
-const supabase = createClient();
+const supabase = createSupabaseBrowserClient();
 
 // Supabaseクライアントが利用できない場合は早期リターン
 if (!supabase) {
