@@ -48,15 +48,15 @@ const LoginModal = () => {
         >
           ログイン
         </button>
-        <p className="text-center text-sm text-gray-400">
-          アカウントをお持ちでない方は
+        <div className="flex flex-col items-center text-sm text-gray-400">
+          <p className="mb-2">アカウントをお持ちでない方は</p>
           <button
             onClick={handleShowRegister}
-            className="text-purple-400 hover:text-purple-300 ml-1"
+            className="text-purple-400 hover:text-purple-300"
           >
             新規登録
           </button>
-        </p>
+        </div>
       </div>
     </Modal>
   );

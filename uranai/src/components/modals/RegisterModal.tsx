@@ -60,15 +60,15 @@ const RegisterModal = () => {
         >
           登録する
         </button>
-        <p className="text-center text-sm text-gray-400">
-          すでにアカウントをお持ちの方は
+        <div className="flex flex-col items-center text-sm text-gray-400">
+          <p className="mb-2">すでにアカウントをお持ちの方は</p>
           <button
             onClick={handleShowLogin}
-            className="text-purple-400 hover:text-purple-300 ml-1"
+            className="text-purple-400 hover:text-purple-300"
           >
             ログイン
           </button>
-        </p>
+        </div>
       </div>
     </Modal>
   );

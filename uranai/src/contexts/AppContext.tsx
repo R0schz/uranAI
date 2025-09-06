@@ -157,11 +157,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
 console.log('Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL);
 console.log('Supabase Key exists:', !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 
-const supabase = createSupabaseBrowserClient();
+let supabase = null;
+try {
+  supabase = createSupabaseBrowserClient();
+  console.log('Supabase client created successfully');
+} catch (error) {
+  console.error('Failed to create Supabase client:', error);
+  supabase = null;
+}
 
 // Supabaseクライアントが利用できない場合は早期リターン
 if (!supabase) {
-  console.warn('Supabase client not available in server environment');
+  console.warn('Supabase client not available');
 }
 
   // プロフィールデータをデータベースから取得する関数
@@ -180,6 +187,8 @@ if (!supabase) {
   }, [withLoading, setProfiles]);
 
   useEffect(() => {
+    if (!supabase) return;
+    
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
         console.log('Auth state changed:', event, session?.user?.id);
         const user = session?.user ?? null;
@@ -297,30 +306,30 @@ if (!supabase) {
         let session = null;
         
         try {
-          // タイムアウト付きでセッション取得（タイムアウト時間を2秒に短縮）
-          const sessionPromise = supabase.auth.getSession();
-          const timeoutPromise = new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('Session check timeout')), 2000)
-          );
-          
-          const { data: { session: sessionData }, error } = await Promise.race([sessionPromise, timeoutPromise]) as any;
-          
-          if (error) {
-            console.error('Error getting session:', error);
+          // セッション取得（タイムアウトなしで直接実行）
+          console.log('Getting session from Supabase...');
+          if (!supabase) {
+            console.warn('Supabase client not available, skipping session check');
             session = null;
           } else {
-            session = sessionData;
+            const { data: { session: sessionData }, error } = await supabase.auth.getSession();
+          
+            if (error) {
+              console.error('Error getting session:', error);
+              session = null;
+            } else {
+              session = sessionData;
+              console.log('Session retrieved successfully:', !!session);
+              if (session) {
+                console.log('User ID:', session.user?.id);
+              }
+            }
           }
-          console.log('Initial session:', session?.user?.id);
-          console.log('Session exists:', !!session);
         } catch (sessionError) {
           console.error('Exception getting session:', sessionError);
           // セッション取得に失敗した場合は、セッションなしとして処理
           session = null;
-          // タイムアウトエラーの場合は警告のみ表示
-          if (sessionError instanceof Error && sessionError.message === 'Session check timeout') {
-            console.warn('Session check timed out, continuing without session');
-          }
+          console.warn('Continuing without session due to error');
         }
         
         if (session?.user) {
@@ -373,7 +382,7 @@ if (!supabase) {
     const authCheckTimeout = setTimeout(() => {
       console.log('Auth check timeout - forcing auth check completion');
       useAppStore.getState().setAuthChecked(true);
-    }, 5000); // 5秒でタイムアウト
+    }, 2500); // 2.5秒でタイムアウト
     
     checkInitialSession().then(() => {
       console.log('checkInitialSession promise resolved');
@@ -388,12 +397,16 @@ if (!supabase) {
     return () => {
         subscription.unsubscribe();
     };
-  }, [supabase, loadProfiles]);
+  }, [loadProfiles]);
 
 
 
   const handleSignIn = async (email: string, password: string) => {
     console.log('handleSignIn called with:', email);
+    if (!supabase) {
+      handleError('Supabase client not available');
+      return;
+    }
     try {
       const { data, error } = await supabase.auth.signInWithPassword({ 
         email, 
@@ -430,6 +443,10 @@ if (!supabase) {
   };
 
   const handleSignUp = async (email: string, password: string) => {
+    if (!supabase) {
+      handleError('Supabase client not available');
+      return;
+    }
     const { error } = await supabase.auth.signUp({
       email,
       password,
@@ -551,6 +568,10 @@ if (!supabase) {
   };
 
   const handleLogout = async () => {
+    if (!supabase) {
+      console.warn('Supabase client not available for logout');
+      return;
+    }
     try {
       console.log('Logging out user...');
       const { error } = await supabase.auth.signOut();
