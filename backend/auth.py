@@ -20,6 +20,8 @@ async def verify_jwt_token(credentials: HTTPAuthorizationCredentials = Depends(s
     try:
         token = credentials.credentials
         print(f"Received token: {token[:20]}...")  # トークンの最初の20文字を表示
+        print(f"JWT_SECRET exists: {bool(JWT_SECRET)}")
+        print(f"JWT_SECRET length: {len(JWT_SECRET) if JWT_SECRET else 0}")
         
         # JWTトークンをデコード（Supabaseの形式に合わせる）
         # audienceチェックを無効化し、より柔軟な検証を行う
@@ -68,12 +70,16 @@ async def verify_jwt_token(credentials: HTTPAuthorizationCredentials = Depends(s
         )
     except jwt.InvalidTokenError as e:
         print(f"JWT validation error: {e}")
+        print(f"JWT validation error type: {type(e)}")
+        print(f"JWT validation error details: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid token"
         )
     except Exception as e:
         print(f"Authentication error: {e}")
+        print(f"Authentication error type: {type(e)}")
+        print(f"Authentication error details: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=f"Authentication failed: {str(e)}"

@@ -60,36 +60,47 @@ const PersonSelectScreen = () => {
     ? selectedPeople.length === 1
     : selectedPeople.length === 2;
 
+  // デバッグ情報を表示
+  console.log('PersonSelectScreen - profiles:', profiles);
+  console.log('PersonSelectScreen - profiles length:', profiles?.length || 0);
+
   return (
     <section className="page p-4">
       <div className="page-content max-w-lg mx-auto">
         <h2 className="font-serif-special text-3xl text-center mb-4">人物を選択</h2>
         <p className="text-center text-gray-400 mb-8">{description}</p>
         <div className="space-y-4 mb-6">
-          {profiles.map((profile: Profile) => (
-            <div
-              key={profile.profile_id}
-              onClick={() => handlePersonSelect(profile.profile_id)}
-              className={`person-card card p-4 flex items-center justify-between cursor-pointer transition ${
-                selectedPeople.includes(profile.profile_id) ? 'border-purple-400' : ''
-              }`}
-            >
-              <div className="flex items-center">
-                <div className="w-12 h-12 rounded-full bg-purple-900 flex items-center justify-center mr-4">
-                  <span className="text-xl font-bold">{profile.nickname.charAt(0)}</span>
+          {profiles && profiles.length > 0 ? (
+            profiles.map((profile: Profile) => (
+              <div
+                key={profile.profile_id}
+                onClick={() => handlePersonSelect(profile.profile_id)}
+                className={`person-card card p-4 flex items-center justify-between cursor-pointer transition ${
+                  selectedPeople.includes(profile.profile_id) ? 'border-purple-400' : ''
+                }`}
+              >
+                <div className="flex items-center">
+                  <div className="w-12 h-12 rounded-full bg-purple-900 flex items-center justify-center mr-4">
+                    <span className="text-xl font-bold">{profile.nickname.charAt(0)}</span>
+                  </div>
+                  <div>
+                    <p className="font-bold text-lg">{profile.nickname}</p>
+                    <p className="text-sm text-gray-400">{profile.birth_date || '生年月日未登録'}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="font-bold text-lg">{profile.nickname}</p>
-                  <p className="text-sm text-gray-400">{profile.birth_date || '生年月日未登録'}</p>
-                </div>
+                <div className={`select-indicator w-6 h-6 rounded-full border-2 ${
+                  selectedPeople.includes(profile.profile_id)
+                    ? 'bg-purple-500 border-purple-400'
+                    : 'border-gray-500'
+                }`}></div>
               </div>
-              <div className={`select-indicator w-6 h-6 rounded-full border-2 ${
-                selectedPeople.includes(profile.profile_id)
-                  ? 'bg-purple-500 border-purple-400'
-                  : 'border-gray-500'
-              }`}></div>
+            ))
+          ) : (
+            <div className="text-center py-8">
+              <p className="text-gray-400 mb-4">登録された人物がいません</p>
+              <p className="text-sm text-gray-500">「新しい人物を追加」ボタンから人物を登録してください</p>
             </div>
-          ))}
+          )}
         </div>
         <div className="text-center">
           <button

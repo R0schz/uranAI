@@ -4,6 +4,7 @@ from . import database
 from .auth import get_current_user
 from pydantic import BaseModel
 import datetime
+from typing import List
 
 class PersonCreate(BaseModel):
     nickname: str
@@ -11,6 +12,21 @@ class PersonCreate(BaseModel):
     birthDate: str | None = None
     birthTime: str | None = None
     birthPlace: str | None = None
+
+# APIからのレスポンスの型を定義
+class ProfileResponse(BaseModel):
+    profile_id: int
+    user_id: str
+    nickname: str
+    name_hiragana: str | None
+    gender: str | None
+    birth_date: datetime.date | None
+    birth_time: datetime.time | None
+    birth_location_json: dict | None
+    is_self_flag: bool
+
+    class Config:
+        orm_mode = True
 
 router = APIRouter(
     prefix="/person",
@@ -23,16 +39,31 @@ def get_db():
         yield db
     finally:
         db.close()
+        
+@router.get("s/{user_id}", response_model=List[ProfileResponse])
+def get_persons_by_user(user_id: str, db: Session = Depends(get_db)):
+    """
+    指定されたuser_idに紐づく全てのプロフィール情報を取得する
+    """
+    profiles = db.query(database.Profile).filter(database.Profile.user_id == user_id).all()
+    if not profiles:
+        return []
+    
+    # is_self_flagをbool型に変換
+    for profile in profiles:
+        profile.is_self_flag = str(profile.is_self_flag).lower() == 'true'
+        
+    return profiles
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
 def create_person(person_data: PersonCreate, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
     
-    # ▼▼▼ usersテーブルにユーザーが存在するか確認・作成する処理を追加 ▼▼▼
-    db_user = db.query(database.User).filter(database.User.id == current_user.id).first()
+    # ユーザーテーブルの確認処理
+    db_user = db.query(database.User).filter(database.User.user_id == current_user['id']).first()
     if not db_user:
         db_user = database.User(
-            id=current_user.id,
-            email=current_user.email,
+            user_id=current_user['id'],
+            email=current_user.get('email'),
             created_at=datetime.datetime.utcnow(),
             updated_at=datetime.datetime.utcnow()
         )
@@ -40,7 +71,6 @@ def create_person(person_data: PersonCreate, db: Session = Depends(get_db), curr
         db.commit()
         db.refresh(db_user)
 
-    # 日付と時刻の変換処理（変更なし）
     birth_date_obj = None
     if person_data.birthDate:
         try:
@@ -55,19 +85,19 @@ def create_person(person_data: PersonCreate, db: Session = Depends(get_db), curr
         except ValueError:
             raise HTTPException(status_code=400, detail="Invalid time format for birthTime. Use HH:MM or HH:MM:SS.")
 
-    # Personオブジェクトの作成（user_idに認証ユーザーのIDをセット）
-    new_person = database.Person(
+    # Profileオブジェクトの作成
+    new_profile = database.Profile(
         nickname=person_data.nickname,
-        name_kana=person_data.name,
+        name_hiragana=person_data.name,
         birth_date=birth_date_obj,
         birth_time=birth_time_obj,
-        birth_place=person_data.birthPlace,
-        user_id=db_user.id, # 確実に存在するユーザーのIDをセット
+        # birth_location_jsonの処理を追加する必要があるかもしれません
+        user_id=db_user.user_id,
         created_at=datetime.datetime.utcnow(),
         updated_at=datetime.datetime.utcnow()
     )
-    db.add(new_person)
+    db.add(new_profile)
     db.commit()
-    db.refresh(new_person)
+    db.refresh(new_profile)
     
-    return {"id": new_person.id}
+    return {"profile_id": new_profile.profile_id}

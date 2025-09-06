@@ -9,6 +9,7 @@ from sqlalchemy import (
     Time,
     JSON,
     Text,
+    Boolean,
 )
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
@@ -57,8 +58,9 @@ class Profile(Base):
     gender = Column(String, nullable=True)
     birth_date = Column(Date, nullable=True)
     birth_time = Column(Time, nullable=True)
-    birth_location_json = Column(JSON, nullable=True)  # 出生地の詳細情報をJSONで保存
-    is_self_flag = Column(String, default="false")  # 自分自身のプロフィールかどうか
+    birth_location_json = Column(JSON, nullable=True)
+    # is_self_flagをBoolean型に変更
+    is_self_flag = Column(Boolean, default=False)
     created_at = Column(TIMESTAMP)
     updated_at = Column(TIMESTAMP)
 

@@ -34,6 +34,15 @@ export default function App() {
 
   const getCurrentScreen = () => {
     console.log('getCurrentScreen called with currentScreen:', currentScreen);
+    console.log('getCurrentScreen - currentScreen type:', typeof currentScreen);
+    console.log('getCurrentScreen - currentScreen value:', JSON.stringify(currentScreen));
+    
+    // currentScreenがnullやundefinedの場合はスプラッシュ画面を表示
+    if (!currentScreen) {
+      console.log('currentScreen is null/undefined, returning SplashScreen');
+      return <SplashScreen />;
+    }
+    
     switch (currentScreen) {
       case 'splash-screen':
         console.log('Returning SplashScreen');
@@ -67,6 +76,7 @@ export default function App() {
       default:
         // 認証済みだが画面が確定しない場合はホームを表示
         console.log('Default case: Returning HomeScreen');
+        console.log('Default case - currentScreen was:', currentScreen);
         return <HomeScreen />;
     }
   };

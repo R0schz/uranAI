@@ -40,6 +40,8 @@ async function getAuthToken(): Promise<string | null> {
     }
     
     console.log('Using current token');
+    console.log('Token expires at:', session.expires_at ? new Date(session.expires_at * 1000) : 'Unknown');
+    console.log('Token type:', session.token_type);
     return session.access_token;
   } catch (error) {
     console.error('Error getting auth token:', error);
@@ -73,12 +75,12 @@ async function authenticatedRequest(
     }
   }
 
-  // タイムアウト設定（45秒）
+  // タイムアウト設定（10秒）
   const controller = new AbortController();
   const timeoutId = setTimeout(() => {
-    console.log('Request timeout after 45 seconds');
+    console.log('Request timeout after 10 seconds');
     controller.abort();
-  }, 45000);
+  }, 10000);
 
   try {
     console.log('Making fetch request to:', `${API_BASE_URL}${endpoint}`);
@@ -136,40 +138,40 @@ export const api = {
     },
   },
 
-          // プロフィール管理
-        profile: {
-          create: async (profileData: any) => {
-            const response = await authenticatedRequest('/profiles/', {
-              method: 'POST',
-              body: JSON.stringify(profileData),
-            });
-            return response.json();
-          },
+  // プロフィール管理
+  profile: {
+    create: async (profileData: any) => {
+      const response = await authenticatedRequest('/profiles/', {
+        method: 'POST',
+        body: JSON.stringify(profileData),
+      });
+      return response.json();
+    },
 
-          getAll: async () => {
-            console.log('Making API request to /profiles/');
-            const response = await authenticatedRequest('/profiles/');
-            console.log('API response received:', response.status);
-            const data = await response.json();
-            console.log('API response data:', data);
-            return data;
-          },
+    getAll: async () => {
+      console.log('Making API request to /profiles/');
+      const response = await authenticatedRequest('/profiles/');
+      console.log('API response received:', response.status);
+      const data = await response.json();
+      console.log('API response data:', data);
+      return data;
+    },
 
-          update: async (id: number, profileData: any) => {
-            const response = await authenticatedRequest(`/profiles/${id}`, {
-              method: 'PUT',
-              body: JSON.stringify(profileData),
-            });
-            return response.json();
-          },
+    update: async (id: number, profileData: any) => {
+      const response = await authenticatedRequest(`/profiles/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(profileData),
+      });
+      return response.json();
+    },
 
-          delete: async (id: number) => {
-            const response = await authenticatedRequest(`/profiles/${id}`, {
-              method: 'DELETE',
-            });
-            return response.json();
-          },
-        },
+    delete: async (id: number) => {
+      const response = await authenticatedRequest(`/profiles/${id}`, {
+        method: 'DELETE',
+      });
+      return response.json();
+    },
+  },
 
   // 占い結果管理
   divination: {

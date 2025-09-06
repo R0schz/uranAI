@@ -13,12 +13,12 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 export interface Profile {
   profile_id: number;
   nickname: string;
-  name_hiragana: string;
+  name_hiragana: string; // `name_kana` から `name_hiragana` に統一
   gender?: 'female' | 'male' | 'unknown';
   birth_date?: string;
   birth_time?: string;
-  birth_location_json?: any;  // 出生地の詳細情報
-  is_self_flag?: boolean;     // 自分自身のプロフィールかどうか
+  birth_location_json?: any;
+  is_self_flag?: boolean;
 }
 
 export type ModalType = 'login' | 'register' | 'premium' | 'ticket' | 'addPerson' | 'confirmPerson' | null;
@@ -175,13 +175,17 @@ if (!supabase) {
   const loadProfiles = useCallback(async () => {
     try {
       console.log('Loading profiles from API...');
+      console.log('Current user state:', useAppStore.getState().isLoggedIn);
       const profiles = await withLoading(api.profile.getAll());
-      console.log('Profiles loaded:', profiles);
-      console.log('Number of profiles:', profiles.length);
-      setProfiles(profiles);
+      console.log('Profiles loaded from API:', profiles);
+      console.log('Number of profiles:', profiles?.length || 0);
+      console.log('Setting profiles in store...');
+      setProfiles(profiles || []);
+      console.log('Profiles set in store successfully');
     } catch (error) {
       console.error('Failed to load profiles:', error);
       console.error('Error details:', error);
+      console.error('Error stack:', error instanceof Error ? error.stack : 'No stack available');
       // エラーが発生してもアプリケーションを停止させない
     }
   }, [withLoading, setProfiles]);
@@ -195,10 +199,16 @@ if (!supabase) {
         const currentScreen = useAppStore.getState().currentScreen;
         const isLoggedIn = useAppStore.getState().isLoggedIn;
         
-        // 既にログイン済みの場合は重複処理を避ける
+        // 既にログイン済みの場合は重複処理を避ける（ただし、プロフィールが空の場合は読み込む）
         if (user && isLoggedIn && event === 'SIGNED_IN') {
-            console.log('Already logged in, skipping duplicate auth state change');
-            return;
+            console.log('Already logged in, checking if profiles need to be loaded...');
+            const currentProfiles = useAppStore.getState().profiles;
+            if (currentProfiles && currentProfiles.length > 0) {
+                console.log('Profiles already loaded, skipping duplicate auth state change');
+                return;
+            } else {
+                console.log('No profiles loaded yet, will load profiles');
+            }
         }
         
         useAppStore.getState().setLoggedIn(!!user);
@@ -208,14 +218,22 @@ if (!supabase) {
             console.log('User logged in, loading profiles...');
             console.log('Current screen:', currentScreen);
             console.log('Auth event:', event);
-            // 認証後にプロフィールデータを読み込み
-            await loadProfiles();
             
-            // 初回ログイン時（スプラッシュ画面から）のみホーム画面に遷移
-            if (event === 'SIGNED_IN' && currentScreen === 'splash-screen') {
+            // 画面遷移を先に実行
+            const currentScreenState = useAppStore.getState().currentScreen;
+            if (event === 'SIGNED_IN' && currentScreenState === 'splash-screen') {
                 console.log('Navigating to home screen from splash screen');
                 useAppStore.getState().setCurrentScreen('home-screen');
+            } else if (event === 'SIGNED_IN') {
+                console.log('User signed in but not from splash screen, current screen:', currentScreenState);
+                // スプラッシュ画面以外からでも、ログイン時はホーム画面に遷移
+                useAppStore.getState().setCurrentScreen('home-screen');
             }
+            
+            // プロフィール読み込みは非同期で実行（画面表示をブロックしない）
+            loadProfiles().catch(error => {
+                console.error('Failed to load profiles in background:', error);
+            });
         } else {
             console.log('User logged out, clearing profiles...');
             useAppStore.getState().setCurrentScreen('splash-screen');
@@ -334,16 +352,10 @@ if (!supabase) {
         
         if (session?.user) {
           console.log('Initial session found, loading profiles...');
+          console.log('User ID:', session.user.id);
           useAppStore.getState().setLoggedIn(true);
-          console.log('About to call loadProfiles...');
-          try {
-            await loadProfiles();
-            console.log('loadProfiles completed successfully');
-          } catch (error) {
-            console.error('Error in loadProfiles:', error);
-          }
           
-          // 保存された画面状態を復元
+          // 画面遷移を先に実行
           const savedScreen = useAppStore.getState().currentScreen;
           console.log('Saved screen from storage (initial session):', savedScreen);
           if (savedScreen && savedScreen !== 'splash-screen') {
@@ -354,6 +366,16 @@ if (!supabase) {
             useAppStore.getState().setCurrentScreen('home-screen');
           }
           console.log('Final currentScreen after initial session check:', useAppStore.getState().currentScreen);
+          
+          // プロフィール読み込みは非同期で実行（画面表示をブロックしない）
+          loadProfiles().then(() => {
+            console.log('loadProfiles completed successfully');
+            const profilesAfterLoad = useAppStore.getState().profiles;
+            console.log('Profiles after load:', profilesAfterLoad);
+            console.log('Number of profiles after load:', profilesAfterLoad?.length || 0);
+          }).catch(error => {
+            console.error('Error in loadProfiles:', error);
+          });
         } else {
           console.log('No initial session found');
           // セッションがない場合は保存された状態をクリア
@@ -382,7 +404,7 @@ if (!supabase) {
     const authCheckTimeout = setTimeout(() => {
       console.log('Auth check timeout - forcing auth check completion');
       useAppStore.getState().setAuthChecked(true);
-    }, 2500); // 2.5秒でタイムアウト
+    }, 1000); // 1秒でタイムアウト
     
     checkInitialSession().then(() => {
       console.log('checkInitialSession promise resolved');
