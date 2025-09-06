@@ -2,7 +2,7 @@ import { createClient } from './supabase';
 
 const supabase = createClient();
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 // JWTトークンを取得する関数（自動更新機能付き）
 async function getAuthToken(): Promise<string | null> {
