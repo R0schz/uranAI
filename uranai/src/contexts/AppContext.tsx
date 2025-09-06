@@ -1,6 +1,10 @@
-"use client";
+"use client"; // 必ずファイルの先頭に記述
 
-import { createContext, useContext, ReactNode, useEffect, useCallback } from 'react';
+import { createSupabaseBrowserClient } from '@/lib/supabase/client'; // パスは適宜調整
+import { createContext, useContext, useState } from 'react';
+
+// ...コンテキストのコード...
+// const supabase = createSupabaseBrowserClient();
 import { useError } from '../hooks/useError';
 import { useLoading } from '../hooks/useLoading';
 import { api } from '../lib/api';
